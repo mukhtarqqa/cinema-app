@@ -53,22 +53,22 @@ export const AnimePage = () => {
     fetchAnime(searchQuery, 1, selectedGenre);
   };
 
-  const filteredAnimes = animes; // Server-side filtering now
+  const filteredAnimes = animes;
 
   return (
     <div className="pt-24 pb-12 px-6 max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <h1 className="text-4xl font-display font-bold tracking-tight uppercase">АНИМЕ</h1>
+        <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight uppercase">АНИМЕ</h1>
         
         <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-          <form onSubmit={handleSearch} className="relative max-w-md w-full">
+          <form onSubmit={handleSearch} className="relative w-full md:w-80">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={20} />
             <input 
               type="text" 
               placeholder="Аниме іздеу..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 focus:outline-none focus:border-[var(--color-accent)] transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 focus:outline-none focus:border-[var(--color-accent)] transition-colors text-sm sm:text-base"
             />
           </form>
 
@@ -78,7 +78,7 @@ export const AnimePage = () => {
               setSelectedGenre(e.target.value);
               setPage(1);
             }}
-            className="bg-white/5 border border-white/10 rounded-full py-3 px-6 focus:outline-none focus:border-[var(--color-accent)] transition-colors appearance-none cursor-pointer min-w-[160px]"
+            className="bg-white/5 border border-white/10 rounded-full py-3 px-6 pr-10 focus:outline-none focus:border-[var(--color-accent)] transition-colors appearance-none cursor-pointer w-full sm:w-auto min-w-fit whitespace-nowrap text-sm sm:text-base"
           >
             <option value="" className="bg-[#0a0502]">Барлық жанрлар</option>
             {genres.map((g, idx) => {
@@ -105,17 +105,17 @@ export const AnimePage = () => {
       )}
 
       {!loading && filteredAnimes.length === 0 && (
-        <div className="h-[50vh] flex items-center justify-center text-white/40">
+        <div className="h-[50vh] flex items-center justify-center text-white/40 text-center px-4">
           Іздеуге немесе жанрға сәйкес аниме табылмады.
         </div>
       )}
 
       {!loading && filteredAnimes.length > 0 && !searchQuery && (
-        <div className="flex justify-center items-center gap-6 pt-8">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-6 pt-8">
           <button 
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="glass px-8 py-3 rounded-full font-bold disabled:opacity-30 hover:bg-white/10 transition-colors"
+            className="glass w-full sm:w-auto px-8 py-3 rounded-full font-bold disabled:opacity-30 hover:bg-white/10 transition-colors"
           >
             Алдыңғы
           </button>
@@ -125,7 +125,7 @@ export const AnimePage = () => {
           <button 
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-            className="glass px-8 py-3 rounded-full font-bold disabled:opacity-30 hover:bg-white/10 transition-colors"
+            className="glass w-full sm:w-auto px-8 py-3 rounded-full font-bold disabled:opacity-30 hover:bg-white/10 transition-colors"
           >
             Келесі
           </button>
