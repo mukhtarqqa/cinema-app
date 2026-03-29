@@ -40,7 +40,7 @@ export const Home = () => {
         </div>
       )}
 
-      <section className="relative h-[60vh] rounded-3xl overflow-hidden flex items-center p-8 sm:p-16">
+      <section className="relative min-h-[60vh] rounded-3xl overflow-hidden flex items-center p-6 sm:p-16">
         <div className="absolute inset-0 z-0">
           <img 
             src="https://picsum.photos/seed/cinema/1920/1080?blur=4" 
@@ -51,11 +51,11 @@ export const Home = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent" />
         </div>
         
-        <div className="relative z-10 max-w-2xl space-y-6">
+        <div className="relative z-10 max-w-2xl space-y-6 w-full">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl sm:text-7xl font-display font-bold leading-[0.9] tracking-tighter uppercase"
+            className="text-3xl sm:text-7xl font-display font-bold leading-[0.9] tracking-tighter uppercase break-words"
           >
             СІЗДІҢ КЕМЕЛ <br /> <span className="text-[var(--color-accent)]">КИНЕМАТОГРАФИЯЛЫҚ</span> ӘЛЕМІҢІЗ
           </motion.h1>
@@ -63,7 +63,7 @@ export const Home = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-lg text-white/60 max-w-md"
+            className="text-base sm:text-lg text-white/60 max-w-md"
           >
             Соңғы блокбастерлер мен танымал аниме серияларын жоғары сапада тамашалаңыз. Барлық таңдаулылар бір жерде.
           </motion.p>
@@ -71,12 +71,12 @@ export const Home = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="flex gap-4"
+            className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
           >
-            <Link to="/movies" className="bg-[var(--color-accent)] text-white px-8 py-4 rounded-full font-bold hover:bg-[var(--color-accent)]/80 transition-colors">
+            <Link to="/movies" className="bg-[var(--color-accent)] text-white px-8 py-4 rounded-full font-bold hover:bg-[var(--color-accent)]/80 transition-colors text-center w-full sm:w-auto">
               Фильмдерді көру
             </Link>
-            <Link to="/anime" className="glass text-white px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-colors">
+            <Link to="/anime" className="glass text-white px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-colors text-center w-full sm:w-auto">
               Аниме көру
             </Link>
           </motion.div>
@@ -85,9 +85,9 @@ export const Home = () => {
 
       <section className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-display font-bold tracking-tight uppercase">ТАНЫМАЛ ФИЛЬМДЕР</h2>
+          <h2 className="text-2xl sm:text-3xl font-display font-bold tracking-tight uppercase">ТАНЫМАЛ ФИЛЬМДЕР</h2>
           <Link to="/movies" className="flex items-center gap-1 text-white/60 hover:text-white transition-colors">
-            <span>Барлығын көру</span>
+            <span className="hidden sm:inline">Барлығын көру</span>
             <ChevronRight size={16} />
           </Link>
         </div>
@@ -103,9 +103,9 @@ export const Home = () => {
 
       <section className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-display font-bold tracking-tight uppercase">СОҢҒЫ АНИМЕ</h2>
+          <h2 className="text-2xl sm:text-3xl font-display font-bold tracking-tight uppercase">СОҢҒЫ АНИМЕ</h2>
           <Link to="/anime" className="flex items-center gap-1 text-white/60 hover:text-white transition-colors">
-            <span>Барлығын көру</span>
+            <span className="hidden sm:inline">Барлығын көру</span>
             <ChevronRight size={16} />
           </Link>
         </div>
