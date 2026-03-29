@@ -53,18 +53,14 @@ export const Movies = () => {
   };
 
   useEffect(() => {
-    // If we have a search query, we use the search endpoint
-    // Otherwise we use discover (genre/year) or popular
     fetchMovies(searchQuery, page, selectedGenre, selectedYear);
   }, [page, selectedGenre, selectedYear, searchQuery]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (page === 1 && selectedGenre === '' && selectedYear === '') {
-      // If we are already on page 1 and no filters, useEffect won't trigger
       fetchMovies(searchQuery, 1, '', '');
     } else {
-      // Changing these will trigger the useEffect
       setPage(1);
       setSelectedGenre('');
       setSelectedYear('');
@@ -74,21 +70,21 @@ export const Movies = () => {
   return (
     <div className="pt-24 pb-12 px-6 max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <h1 className="text-4xl font-display font-bold tracking-tight uppercase">ФИЛЬМДЕР</h1>
+        <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight uppercase">ФИЛЬМДЕР</h1>
         
         <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-          <form onSubmit={handleSearch} className="relative max-w-md w-full">
+          <form onSubmit={handleSearch} className="relative w-full md:w-80">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={20} />
             <input 
               type="text" 
               placeholder="Фильмдерді іздеу..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 focus:outline-none focus:border-[var(--color-accent)] transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 focus:outline-none focus:border-[var(--color-accent)] transition-colors text-sm sm:text-base"
             />
           </form>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto">
             <select 
               value={selectedGenre}
               onChange={(e) => {
@@ -96,7 +92,7 @@ export const Movies = () => {
                 setSearchQuery('');
                 setPage(1);
               }}
-              className="bg-white/5 border border-white/10 rounded-full py-3 px-6 focus:outline-none focus:border-[var(--color-accent)] transition-colors appearance-none cursor-pointer"
+              className="bg-white/5 border border-white/10 rounded-full py-3 px-6 pr-10 focus:outline-none focus:border-[var(--color-accent)] transition-colors appearance-none cursor-pointer flex-1 sm:flex-none min-w-fit whitespace-nowrap text-sm sm:text-base"
             >
               <option value="" className="bg-[#0a0502]">Барлық жанрлар</option>
               {genres.map(g => (
@@ -115,7 +111,7 @@ export const Movies = () => {
                 setSearchQuery('');
                 setPage(1);
               }}
-              className="w-24 bg-white/5 border border-white/10 rounded-full py-3 px-6 focus:outline-none focus:border-[var(--color-accent)] transition-colors"
+              className="w-24 sm:w-28 bg-white/5 border border-white/10 rounded-full py-3 px-4 sm:px-6 focus:outline-none focus:border-[var(--color-accent)] transition-colors text-sm sm:text-base"
             />
           </div>
         </div>
@@ -148,18 +144,18 @@ export const Movies = () => {
       )}
 
       {!loading && !error && movies.length > 0 && (
-        <div className="flex justify-center gap-4 pt-8">
+        <div className="flex flex-row justify-center items-center gap-4 pt-8">
           <button 
             disabled={page === 1}
             onClick={() => setPage(p => p - 1)}
-            className="glass px-6 py-2 rounded-full disabled:opacity-30"
+            className="glass px-6 py-2 rounded-full disabled:opacity-30 hover:bg-white/10 transition-colors"
           >
             Алдыңғы
           </button>
-          <span className="flex items-center font-bold">{page}</span>
+          <span className="flex items-center font-mono font-bold text-white/60">{page}</span>
           <button 
             onClick={() => setPage(p => p + 1)}
-            className="glass px-6 py-2 rounded-full"
+            className="glass px-6 py-2 rounded-full hover:bg-white/10 transition-colors"
           >
             Келесі
           </button>
