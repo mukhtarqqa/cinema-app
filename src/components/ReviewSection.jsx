@@ -1,0 +1,124 @@
+import React, { useEffect, useState } from 'react';
+import { db, handleFirestoreError, OperationType } from '../firebase.js';
+import { collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, deleteDoc, doc } from 'firebase/firestore';
+import { useAuth } from '../hooks/useAuth.jsx';
+import { Star, Send, Trash2, User } from 'lucide-react';
+
+export const ReviewSection = ({ contentId, contentType }) => {
+  const { user, login } = useAuth();
+  const [reviews, setReviews] = useState([]);
+  const [text, setText] = useState('');
+  const [rating, setRating] = useState(10);
+
+  useEffect(() => {
+    const q = query(
+      collection(db, 'reviews'),
+      where('contentId', '==', contentId),
+      where('contentType', '==', contentType),
+      orderBy('createdAt', 'desc')
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setReviews(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubscribe();
+  }, [contentId, contentType]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!user) return login();
+    if (!text.trim()) return;
+
+    try {
+      await addDoc(collection(db, 'reviews'), {
+        uid: user.uid,
+        authorName: user.displayName || 'Аноним',
+        contentId,
+        contentType,
+        rating,
+        text,
+        createdAt: serverTimestamp(),
+      });
+      setText('');
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, 'reviews');
+    }
+  };
+
+  const deleteReview = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'reviews', id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, 'reviews');
+    }
+  };
+
+  return (
+    <div className="space-y-8 pt-12 border-t border-white/5">
+      <h2 className="text-3xl font-display font-bold tracking-tight">ПІКІРЛЕР</h2>
+
+      <form onSubmit={handleSubmit} className="glass p-6 rounded-3xl space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-bold text-white/60 uppercase tracking-widest">Бағалау ({contentType === 'movie' ? 'фильм' : 'аниме'})</span>
+          <div className="flex gap-1">
+            {[...Array(10)].map((_, i) => (
+              <button 
+                key={i} 
+                type="button"
+                onClick={() => setRating(i + 1)}
+                className={`p-1 transition-colors ${rating > i ? 'text-yellow-400' : 'text-white/10'}`}
+              >
+                <Star size={20} fill="currentColor" />
+              </button>
+            ))}
+          </div>
+        </div>
+        <textarea 
+          placeholder="Өз ойыңызбен бөлісіңіз..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 min-h-[120px] focus:outline-none focus:border-[var(--color-accent)] transition-colors"
+        />
+        <div className="flex justify-end">
+          <button type="submit" className="flex items-center gap-2 bg-[var(--color-accent)] px-6 py-3 rounded-full font-bold hover:bg-[var(--color-accent)]/80 transition-colors">
+            <Send size={18} />
+            <span>Жіберу</span>
+          </button>
+        </div>
+      </form>
+
+      <div className="space-y-6">
+        {reviews.length === 0 ? (
+          <p className="text-white/40 text-center py-8">Әзірге пікірлер жоқ. Алғашқы болып пікір қалдырыңыз!</p>
+        ) : (
+          reviews.map((review) => (
+            <div key={review.id} className="glass p-6 rounded-3xl space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                    <User size={20} className="text-white/40" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold">{review.authorName}</h4>
+                    <p className="text-xs text-white/40">{review.createdAt?.toDate().toLocaleDateString()}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1 text-yellow-400 font-bold">
+                    <Star size={16} fill="currentColor" />
+                    <span>{review.rating}</span>
+                  </div>
+                  {user?.uid === review.uid && (
+                    <button onClick={() => deleteReview(review.id)} className="p-2 text-white/20 hover:text-red-500 transition-colors">
+                      <Trash2 size={18} />
+                    </button>
+                  )}
+                </div>
+              </div>
+              <p className="text-white/80 leading-relaxed">{review.text}</p>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};

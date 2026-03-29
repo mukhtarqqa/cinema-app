@@ -1,0 +1,170 @@
+import React, { useEffect, useState } from 'react';
+import { tmdbService } from '../services/tmdb.js';
+import { MovieCard } from '../components/MovieCard.jsx';
+import { Search, Loader2, AlertCircle } from 'lucide-react';
+
+export const Movies = () => {
+  const [movies, setMovies] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedGenre, setSelectedGenre] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
+  const [page, setPage] = useState(1);
+  const [error, setError] = useState(null);
+  const [isDemo, setIsDemo] = useState(false);
+
+  useEffect(() => {
+    const fetchGenres = async () => {
+      try {
+        const data = await tmdbService.getGenres();
+        setGenres(data.genres || []);
+      } catch (error) {
+        console.error('Failed to fetch genres', error);
+      }
+    };
+    fetchGenres();
+  }, []);
+
+  const fetchMovies = async (query = '', p = 1, genre = '', year = '') => {
+    setLoading(true);
+    setError(null);
+    try {
+      let data;
+      if (query) {
+        data = await tmdbService.search(query, p);
+      } else if (genre || year) {
+        data = await tmdbService.discover({ 
+          page: p, 
+          with_genres: genre, 
+          primary_release_year: year 
+        });
+      } else {
+        data = await tmdbService.getPopular(p);
+      }
+      setMovies(data.results || []);
+      setIsDemo(!!data.is_demo);
+    } catch (error) {
+      console.error('Failed to fetch movies', error);
+      setError('Фильмдерді жүктеу сәтсіз аяқталды. Кейінірек қайталап көріңіз.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // If we have a search query, we use the search endpoint
+    // Otherwise we use discover (genre/year) or popular
+    fetchMovies(searchQuery, page, selectedGenre, selectedYear);
+  }, [page, selectedGenre, selectedYear, searchQuery]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (page === 1 && selectedGenre === '' && selectedYear === '') {
+      // If we are already on page 1 and no filters, useEffect won't trigger
+      fetchMovies(searchQuery, 1, '', '');
+    } else {
+      // Changing these will trigger the useEffect
+      setPage(1);
+      setSelectedGenre('');
+      setSelectedYear('');
+    }
+  };
+
+  return (
+    <div className="pt-24 pb-12 px-6 max-w-7xl mx-auto space-y-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <h1 className="text-4xl font-display font-bold tracking-tight uppercase">ФИЛЬМДЕР</h1>
+        
+        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+          <form onSubmit={handleSearch} className="relative max-w-md w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={20} />
+            <input 
+              type="text" 
+              placeholder="Фильмдерді іздеу..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 focus:outline-none focus:border-[var(--color-accent)] transition-colors"
+            />
+          </form>
+
+          <div className="flex gap-2">
+            <select 
+              value={selectedGenre}
+              onChange={(e) => {
+                setSelectedGenre(e.target.value);
+                setSearchQuery('');
+                setPage(1);
+              }}
+              className="bg-white/5 border border-white/10 rounded-full py-3 px-6 focus:outline-none focus:border-[var(--color-accent)] transition-colors appearance-none cursor-pointer"
+            >
+              <option value="" className="bg-[#0a0502]">Барлық жанрлар</option>
+              {genres.map(g => (
+                <option key={g.id} value={g.id} className="bg-[#0a0502]">{g.name}</option>
+              ))}
+            </select>
+
+            <input 
+              type="number" 
+              placeholder="Жыл"
+              min="1900"
+              max="2026"
+              value={selectedYear}
+              onChange={(e) => {
+                setSelectedYear(e.target.value);
+                setSearchQuery('');
+                setPage(1);
+              }}
+              className="w-24 bg-white/5 border border-white/10 rounded-full py-3 px-6 focus:outline-none focus:border-[var(--color-accent)] transition-colors"
+            />
+          </div>
+        </div>
+      </div>
+
+      {isDemo && (
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex items-center gap-4 text-amber-400">
+          <AlertCircle size={20} />
+          <p className="text-sm">
+            <strong>Демо режимі:</strong> Фильм деректері қазір симуляцияланған. Нақты деректер үшін AI Studio Secrets бөліміне <code>TMDB_API_KEY</code> қосыңыз.
+          </p>
+        </div>
+      )}
+
+      {error ? (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-8 text-center space-y-4">
+          <AlertCircle className="mx-auto text-red-400" size={48} />
+          <p className="text-red-400 font-medium">{error}</p>
+        </div>
+      ) : loading ? (
+        <div className="h-[50vh] flex items-center justify-center">
+          <Loader2 className="animate-spin text-[var(--color-accent)]" size={48} />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+          {movies.map((movie) => (
+            <MovieCard key={movie.id} movie={movie} />
+          ))}
+        </div>
+      )}
+
+      {!loading && !error && movies.length > 0 && (
+        <div className="flex justify-center gap-4 pt-8">
+          <button 
+            disabled={page === 1}
+            onClick={() => setPage(p => p - 1)}
+            className="glass px-6 py-2 rounded-full disabled:opacity-30"
+          >
+            Алдыңғы
+          </button>
+          <span className="flex items-center font-bold">{page}</span>
+          <button 
+            onClick={() => setPage(p => p + 1)}
+            className="glass px-6 py-2 rounded-full"
+          >
+            Келесі
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};

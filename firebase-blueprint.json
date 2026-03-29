@@ -1,0 +1,60 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "format": "email", "description": "User email" },
+        "displayName": { "type": "string", "description": "User display name" },
+        "photoURL": { "type": "string", "description": "User avatar URL" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Account creation timestamp" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Favorite": {
+      "title": "Favorite",
+      "description": "User's favorite movie or anime",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "User UID" },
+        "contentId": { "type": "string", "description": "ID of the movie or anime" },
+        "contentType": { "type": "string", "enum": ["movie", "anime"], "description": "Type of content" },
+        "title": { "type": "string", "description": "Title of the content" },
+        "posterPath": { "type": "string", "description": "Poster image path" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When it was favorited" }
+      },
+      "required": ["uid", "contentId", "contentType"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "User review for a movie or anime",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "User UID" },
+        "authorName": { "type": "string", "description": "Author display name" },
+        "contentId": { "type": "string", "description": "ID of the movie or anime" },
+        "contentType": { "type": "string", "enum": ["movie", "anime"], "description": "Type of content" },
+        "rating": { "type": "number", "description": "Rating from 1 to 10" },
+        "text": { "type": "string", "description": "Review text" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When it was posted" }
+      },
+      "required": ["uid", "contentId", "contentType", "rating", "text"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "favorites/{favoriteId}": {
+      "schema": "Favorite",
+      "description": "User favorites"
+    },
+    "reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Content reviews"
+    }
+  }
+}

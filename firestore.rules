@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.uid;
+    }
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email']) &&
+             data.uid == request.auth.uid &&
+             data.email is string &&
+             data.email.size() > 0;
+    }
+    function isValidFavorite(data) {
+      return data.keys().hasAll(['uid', 'contentId', 'contentType']) &&
+             data.uid == request.auth.uid &&
+             data.contentType in ['movie', 'anime'] &&
+             data.contentId is string;
+    }
+    function isValidReview(data) {
+      return data.keys().hasAll(['uid', 'contentId', 'contentType', 'rating', 'text']) &&
+             data.uid == request.auth.uid &&
+             data.rating is number && data.rating >= 1 && data.rating <= 10 &&
+             data.text is string && data.text.size() > 0 && data.text.size() < 5000;
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId) && isValidUser(request.resource.data);
+    }
+
+    match /favorites/{favoriteId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidFavorite(request.resource.data);
+      allow delete: if isDocOwner();
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true; // Reviews are public
+      allow create: if isAuthenticated() && isValidReview(request.resource.data);
+      allow update, delete: if isDocOwner() && isValidReview(request.resource.data);
+    }
+  }
+}
