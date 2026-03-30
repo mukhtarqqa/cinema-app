@@ -1,14 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db, googleProvider } from '../firebase.js';
 import { 
-  signInWithPopup, 
-  signOut, 
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  updateProfile,
-  RecaptchaVerifier,
-  signInWithPhoneNumber
+  signInWithPopup, signOut, onAuthStateChanged, 
+  signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+  updateProfile, RecaptchaVerifier, signInWithPhoneNumber,
+  sendPasswordResetEmail, sendEmailVerification 
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
@@ -25,9 +21,8 @@ export const AuthProvider = ({ children }) => {
       await setDoc(ref, {
         uid: u.uid,
         email: u.email || '',
-        phoneNumber: u.phoneNumber || '',
-        displayName: u.displayName || 'Пайдаланушы',
-        photoURL: u.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+        displayName: u.displayName || 'User',
+        photoURL: u.photoURL || '',
         createdAt: serverTimestamp(),
       });
     }
@@ -49,16 +44,25 @@ export const AuthProvider = ({ children }) => {
   const login = () => signInWithPopup(auth, googleProvider);
 
   const setupRecaptcha = (containerId) => {
-    if (window.recaptchaVerifier) return window.recaptchaVerifier;
+    if (window.recaptchaVerifier) {
+      window.recaptchaVerifier.clear();
+    }
     window.recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
-      'size': 'invisible'
+      'size': 'normal', // 'invisible' орнына 'normal' қойдық, сонда капча анық көрінеді және қате аз болады
+      'callback': () => {}
     });
     return window.recaptchaVerifier;
   };
 
-  const loginPhone = async (phoneNumber, containerId) => {
+  const loginPhone = (phoneNumber, containerId) => {
     const verifier = setupRecaptcha(containerId);
     return signInWithPhoneNumber(auth, phoneNumber, verifier);
+  };
+
+  const resetPassword = (email) => sendPasswordResetEmail(auth, email);
+  
+  const verifyEmail = () => {
+    if (auth.currentUser) return sendEmailVerification(auth.currentUser);
   };
 
   const loginEmail = (email, password) => signInWithEmailAndPassword(auth, email, password);
@@ -66,6 +70,7 @@ export const AuthProvider = ({ children }) => {
   const registerEmail = async (email, password, name) => {
     const res = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(res.user, { displayName: name });
+    await sendEmailVerification(res.user);
     await saveUserToDb(res.user);
     return res;
   };
@@ -74,7 +79,8 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ 
-      user, loading, login, loginPhone, loginEmail, registerEmail, logout 
+      user, loading, login, loginPhone, loginEmail, 
+      registerEmail, logout, resetPassword, verifyEmail 
     }}>
       {children}
     </AuthContext.Provider>
