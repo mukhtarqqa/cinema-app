@@ -1,61 +1,84 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db, googleProvider } from '../firebase.js';
-import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import {
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  OAuthProvider
+} from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
+const appleProvider = new OAuthProvider('apple.com');
 const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const saveUserToDb = async (u) => {
+    const ref = doc(db, 'users', u.uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      await setDoc(ref, {
+        uid: u.uid,
+        email: u.email,
+        displayName: u.displayName || '',
+        photoURL: u.photoURL || '',
+        createdAt: serverTimestamp(),
+      });
+    }
+  };
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const userRef = doc(db, 'users', firebaseUser.uid);
-        const userSnap = await getDoc(userRef);
-        if (!userSnap.exists()) {
-          await setDoc(userRef, {
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            displayName: firebaseUser.displayName,
-            photoURL: firebaseUser.photoURL,
-            createdAt: serverTimestamp(),
-          });
-        }
-        setUser(firebaseUser);
+    const unsub = onAuthStateChanged(auth, async (u) => {
+      if (u) {
+        await saveUserToDb(u);
+        setUser(u);
       } else {
         setUser(null);
       }
       setLoading(false);
     });
-
-    return () => unsubscribe();
+    return () => unsub();
   }, []);
 
-  const login = async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      console.error('Login failed', error);
-    }
+  const loginGoogle = () => signInWithPopup(auth, googleProvider);
+  
+  const loginApple = () => signInWithPopup(auth, appleProvider);
+
+  const loginEmail = (email, password) => {
+    return signInWithEmailAndPassword(auth, email, password);
   };
 
-  const logout = async () => {
-    await signOut(auth);
+  const registerEmail = async (email, password, name) => {
+    const res = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(res.user, { displayName: name });
+    await saveUserToDb(res.user);
+    return res;
   };
+
+  const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      loginGoogle, 
+      loginApple, 
+      loginEmail, 
+      registerEmail, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (ctx === undefined) throw new Error('useAuth error');
+  return ctx;
 };
