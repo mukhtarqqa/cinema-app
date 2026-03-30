@@ -1,12 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth, db, googleProvider, appleProvider } from '../firebase.js';
+import { auth, db, googleProvider } from '../firebase.js';
 import { 
   signInWithPopup, 
   signOut, 
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  updateProfile
+  updateProfile,
+  RecaptchaVerifier,
+  signInWithPhoneNumber
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
@@ -22,9 +24,10 @@ export const AuthProvider = ({ children }) => {
     if (!snap.exists()) {
       await setDoc(ref, {
         uid: u.uid,
-        email: u.email,
-        displayName: u.displayName || '',
-        photoURL: u.photoURL || '',
+        email: u.email || '',
+        phoneNumber: u.phoneNumber || '',
+        displayName: u.displayName || 'Пайдаланушы',
+        photoURL: u.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
         createdAt: serverTimestamp(),
       });
     }
@@ -44,11 +47,21 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = () => signInWithPopup(auth, googleProvider);
-  const loginApple = () => signInWithPopup(auth, appleProvider);
-  
-  const loginEmail = (email, password) => {
-    return signInWithEmailAndPassword(auth, email, password);
+
+  const setupRecaptcha = (containerId) => {
+    if (window.recaptchaVerifier) return window.recaptchaVerifier;
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
+      'size': 'invisible'
+    });
+    return window.recaptchaVerifier;
   };
+
+  const loginPhone = async (phoneNumber, containerId) => {
+    const verifier = setupRecaptcha(containerId);
+    return signInWithPhoneNumber(auth, phoneNumber, verifier);
+  };
+
+  const loginEmail = (email, password) => signInWithEmailAndPassword(auth, email, password);
 
   const registerEmail = async (email, password, name) => {
     const res = await createUserWithEmailAndPassword(auth, email, password);
@@ -61,13 +74,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ 
-      user, 
-      loading, 
-      login, 
-      loginApple, 
-      loginEmail, 
-      registerEmail, 
-      logout 
+      user, loading, login, loginPhone, loginEmail, registerEmail, logout 
     }}>
       {children}
     </AuthContext.Provider>
