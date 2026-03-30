@@ -7,6 +7,7 @@ import { Movies } from './pages/Movies.jsx';
 import { AnimePage } from './pages/Anime.jsx';
 import { Details } from './pages/Details.jsx';
 import { Favorites } from './pages/Favorites.jsx';
+import { Login } from './pages/Login.jsx'; // Жаңа бетті импорттау
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} /> {/* Логин бетінің жолы */}
           <Route path="/movies" element={<Movies />} />
           <Route path="/anime" element={<AnimePage />} />
           <Route path="/movie/:id" element={<Details type="movie" />} />
