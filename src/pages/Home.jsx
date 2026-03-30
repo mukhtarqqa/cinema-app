@@ -3,7 +3,6 @@ import { tmdbService } from '../services/tmdb.js';
 import { anilibriaService } from '../services/anilibria.js';
 import { MovieCard } from '../components/MovieCard.jsx';
 import { AnimeCard } from '../components/AnimeCard.jsx';
-import { motion } from 'motion/react';
 import { ChevronRight, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -45,45 +44,33 @@ export const Home = () => {
             alt="Gojo Satoru" 
             className="w-full h-full object-cover object-center opacity-70"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent" />
         </div>
         
         <div className="relative z-10 max-w-4xl space-y-10 w-full">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-[1.75rem] sm:text-7xl lg:text-8xl font-black leading-[1.05] tracking-tighter uppercase"
-          >
+          <h1 className="text-[1.75rem] sm:text-7xl lg:text-8xl font-black leading-[1.05] tracking-tighter uppercase">
             АСПАН МЕН ЖЕР <br /> 
             <span className="text-[#ff4d00] whitespace-nowrap">АРАСЫНДА</span> — ТЕК МЕН <br />
             ҒАНА АСҚАҚПЫН
-          </motion.h1>
+          </h1>
           
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="space-y-4"
-          >
+          <div className="space-y-4">
             <p className="text-white/60 text-lg sm:text-2xl font-medium leading-relaxed max-w-2xl border-l-2 border-[#ff4d00]/50 pl-6">
-              "Среди неба и земли, я один достоин чести." <br className="sm:hidden" />
-              <span className="text-sm sm:text-base font-bold text-[#ff4d00] mt-2 block">— Годжо Сатору</span>
+              "Среди неба и земли, я один достоин чести."
             </p>
-          </motion.div>
+            <p className="text-sm sm:text-base font-bold text-[#ff4d00] pl-6">
+              — Годжо Сатору
+            </p>
+          </div>
           
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex flex-col sm:flex-row gap-6 pt-4"
-          >
+          <div className="flex flex-col sm:flex-row gap-6 pt-4">
             <Link to="/movies" className="bg-[#ff4d00] text-white px-14 py-4 rounded-full font-bold text-sm uppercase tracking-widest text-center shadow-2xl shadow-[#ff4d00]/30 hover:scale-105 transition-all active:scale-95">
               Фильмдерді көру
             </Link>
-            <Link to="/anime" className="backdrop-blur-md bg-white/5 border border-white/10 text-white px-14 py-4 rounded-full font-bold text-sm uppercase tracking-widest text-center hover:bg-white/10 transition-all active:scale-95">
+            <Link to="/anime" className="bg-white/5 backdrop-blur-md border border-white/10 text-white px-14 py-4 rounded-full font-bold text-sm uppercase tracking-widest text-center hover:bg-white/10 transition-all active:scale-95">
               Аниме көру
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
