@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
     return () => unsub();
   }, []);
 
-  const loginGoogle = () => signInWithPopup(auth, googleProvider);
+  const login = () => signInWithPopup(auth, googleProvider);
   const loginApple = () => signInWithPopup(auth, appleProvider);
   
   const loginEmail = (email, password) => {
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{ 
       user, 
       loading, 
-      loginGoogle, 
+      login, 
       loginApple, 
       loginEmail, 
       registerEmail, 
