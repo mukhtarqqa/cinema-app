@@ -13,25 +13,20 @@ import {
   doc, 
   getDoc, 
   setDoc, 
-  serverTimestamp, 
-  getDocFromServer 
+  serverTimestamp 
 } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-setPersistence(auth, browserSessionPersistence).catch(err => {
-  console.error('Failed to set auth persistence:', err);
-});
+setPersistence(auth, browserSessionPersistence).catch(err => console.error(err));
 
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 
-// Провайдерлер
 export const googleProvider = new GoogleAuthProvider();
 export const appleProvider = new OAuthProvider('apple.com');
 
-// ReviewSection үшін қажетті типтер мен функциялар
 export const OperationType = {
   CREATE: 'create',
   UPDATE: 'update',
@@ -44,10 +39,7 @@ export const OperationType = {
 export function handleFirestoreError(error, operationType, path) {
   const errInfo = {
     error: error instanceof Error ? error.message : String(error),
-    authInfo: {
-      userId: auth.currentUser?.uid,
-      email: auth.currentUser?.email
-    },
+    authInfo: { userId: auth.currentUser?.uid, email: auth.currentUser?.email },
     operationType,
     path
   };
