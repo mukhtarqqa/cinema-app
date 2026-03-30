@@ -14,24 +14,28 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const saveUserToDb = async (u) => {
-    const ref = doc(db, 'users', u.uid);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) {
-      await setDoc(ref, {
-        uid: u.uid,
-        email: u.email || '',
-        displayName: u.displayName || 'User',
-        photoURL: u.photoURL || '',
-        createdAt: serverTimestamp(),
-      });
+    try {
+      const ref = doc(db, 'users', u.uid);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) {
+        await setDoc(ref, {
+          uid: u.uid,
+          email: u.email || '',
+          displayName: u.displayName || 'User',
+          photoURL: u.photoURL || '',
+          createdAt: serverTimestamp(),
+        });
+      }
+    } catch (error) {
+      console.error("Firestore error:", error);
     }
   };
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (u) => {
+    const unsub = onAuthStateChanged(auth, (u) => {
       if (u) {
-        await saveUserToDb(u);
         setUser(u);
+        saveUserToDb(u); 
       } else {
         setUser(null);
       }
@@ -54,7 +58,7 @@ export const AuthProvider = ({ children }) => {
     const res = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(res.user, { displayName: name });
     await sendEmailVerification(res.user);
-    await saveUserToDb(res.user);
+    saveUserToDb(res.user);
     return res;
   };
 
