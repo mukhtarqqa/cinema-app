@@ -1,17 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth, db, googleProvider } from '../firebase.js';
-import {
-  signInWithPopup,
-  signOut,
+import { auth, db, googleProvider, appleProvider } from '../firebase.js';
+import { 
+  signInWithPopup, 
+  signOut, 
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  updateProfile,
-  OAuthProvider
+  updateProfile
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
-const appleProvider = new OAuthProvider('apple.com');
 const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
@@ -46,9 +44,8 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const loginGoogle = () => signInWithPopup(auth, googleProvider);
-  
   const loginApple = () => signInWithPopup(auth, appleProvider);
-
+  
   const loginEmail = (email, password) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
@@ -79,6 +76,6 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (ctx === undefined) throw new Error('useAuth error');
+  if (ctx === undefined) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 };
