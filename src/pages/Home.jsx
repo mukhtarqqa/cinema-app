@@ -3,14 +3,25 @@ import { tmdbService } from '../services/tmdb.js';
 import { anilibriaService } from '../services/anilibria.js';
 import { MovieCard } from '../components/MovieCard.jsx';
 import { AnimeCard } from '../components/AnimeCard.jsx';
-import { motion } from 'motion/react';
+// ДОБАВИЛИ AnimatePresence для анимации смены картинок
+import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+// Массив картинок для заднего фона
+const HERO_IMAGES = [
+  "https://i.pinimg.com/736x/7a/83/40/7a83402d95e085d9f69c14d19156fced.jpg", // Gojo Awakening
+  "https://i.pinimg.com/1200x/dc/67/f5/dc67f5587fa604c32fada9ccbe6d65d6.jpg", // New 1
+  "https://i.pinimg.com/1200x/09/26/5b/09265b4657418f09a6d7ee7609ebe7f3.jpg"  // New 2
+];
 
 export const Home = () => {
   const [movies, setMovies] = useState([]);
   const [animes, setAnimes] = useState([]);
   const [isDemo, setIsDemo] = useState(false);
+  
+  // Состояние для индекса текущей картинки
+  const [currentImgIndex, setCurrentImgIndex] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,8 +40,21 @@ export const Home = () => {
     fetchData();
   }, []);
 
+  // Эффект для автоматической смены картинок
+  useEffect(() => {
+    // Устанавливаем интервал (например, каждые 5 секунд)
+    const timer = setInterval(() => {
+      setCurrentImgIndex((prevIndex) => 
+        // Если дошли до конца массива, возвращаемся к 0, иначе +1
+        prevIndex === HERO_IMAGES.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 5000); // 5000 мс = 5 секунд
+
+    // Очищаем интервал при размонтировании компонента
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    /* px-1 АРҚЫЛЫ ТЕЛЕФОНДА ШЕТІНЕ БАРЫНША ЖАҚЫНДАТТЫҚ */
     <div className="pt-24 pb-12 px-1 sm:px-6 max-w-7xl mx-auto space-y-16">
       {isDemo && (
         <div className="mx-2 bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex items-center gap-4 text-amber-400">
@@ -39,20 +63,33 @@ export const Home = () => {
         </div>
       )}
 
-      {/* HERO SECTION - СЕН БЕРГЕН ФОТО ЖӘНЕ ТҮЗЕТІЛГЕН МӘТІН */}
+      {/* HERO SECTION */}
       <section className="relative min-h-[550px] sm:min-h-[750px] rounded-[2.5rem] overflow-hidden flex items-center p-6 sm:p-20 shadow-2xl border border-white/5">
+        
+        {/* БЛОК С ФОНОМ (Слайдшоу) */}
         <div className="absolute inset-0 z-0">
-          <img 
-            /* СЕН ЖІБЕРГЕН PININTEREST СІЛТЕМЕСІ */
-            src="https://i.pinimg.com/736x/7a/83/40/7a83402d95e085d9f69c14d19156fced.jpg" 
-            alt="Gojo Satoru Awakening" 
-            className="w-full h-full object-cover object-center opacity-80"
-          />
-          {/* Текст жақсы көріну үшін градиентті күшейттім */}
+          <AnimatePresence mode="wait">
+            <motion.img 
+              // Ключ обязателен для AnimatePresence, чтобы он понимал, что элемент изменился
+              key={currentImgIndex}
+              src={HERO_IMAGES[currentImgIndex]} 
+              alt={`Hero background ${currentImgIndex}`} 
+              className="absolute inset-0 w-full h-full object-cover object-center opacity-80"
+              
+              // Настройки анимации (плавное появление и исчезновение)
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.8 }} // Учитываем изначальную opacity-80 из класса
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1 }} // Длительность перехода - 1 секунда
+            />
+          </AnimatePresence>
+          
+          {/* Градиенты поверх картинок (оставляем без изменений) */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
         </div>
         
+        {/* КОНТЕНТ ПОВЕРХ ФОНА (Оставляем без изменений) */}
         <div className="relative z-10 max-w-4xl space-y-10 w-full">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
@@ -94,7 +131,7 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* ТАНЫМАЛ СЕКЦИЯЛАР (ӨЗГЕРІССІЗ) */}
+      {/* ТАНЫМАЛ СЕКЦИЯЛАР (Без изменений) */}
       <section className="px-3 sm:px-0 space-y-8">
         <div className="flex items-center justify-between border-b border-white/5 pb-4">
           <h2 className="text-2xl font-bold uppercase tracking-tight">Танымал фильмдер</h2>
