@@ -3,8 +3,7 @@ import { auth, db, googleProvider } from '../firebase.js';
 import { 
   signInWithPopup, signOut, onAuthStateChanged, 
   signInWithEmailAndPassword, createUserWithEmailAndPassword, 
-  updateProfile, RecaptchaVerifier, signInWithPhoneNumber,
-  sendPasswordResetEmail, sendEmailVerification 
+  updateProfile, sendPasswordResetEmail, sendEmailVerification 
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
@@ -41,23 +40,7 @@ export const AuthProvider = ({ children }) => {
     return () => unsub();
   }, []);
 
-  const login = () => signInWithPopup(auth, googleProvider);
-
-  const setupRecaptcha = (containerId) => {
-    if (window.recaptchaVerifier) {
-      window.recaptchaVerifier.clear();
-    }
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
-      'size': 'normal', // 'invisible' орнына 'normal' қойдық, сонда капча анық көрінеді және қате аз болады
-      'callback': () => {}
-    });
-    return window.recaptchaVerifier;
-  };
-
-  const loginPhone = (phoneNumber, containerId) => {
-    const verifier = setupRecaptcha(containerId);
-    return signInWithPhoneNumber(auth, phoneNumber, verifier);
-  };
+  const loginGoogle = () => signInWithPopup(auth, googleProvider);
 
   const resetPassword = (email) => sendPasswordResetEmail(auth, email);
   
@@ -79,7 +62,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ 
-      user, loading, login, loginPhone, loginEmail, 
+      user, loading, loginGoogle, loginEmail, 
       registerEmail, logout, resetPassword, verifyEmail 
     }}>
       {children}
