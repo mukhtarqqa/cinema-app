@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth.jsx';
-import { db, storage } from '../firebase.js';
+import { db } from '../firebase.js';
 import { collection, query, where, onSnapshot, orderBy, deleteDoc, doc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Heart, Loader2, Clock, History, Star, User, LogOut, Camera, Trash2, Edit2, Check, X } from 'lucide-react';
@@ -17,7 +16,11 @@ export const Profile = () => {
   let [uploading, setUploading] = useState(false);
   let [isEditingName, setIsEditingName] = useState(false);
   let [newName, setNewName] = useState('');
+  let [localPhotoURL, setLocalPhotoURL] = useState(null);
   let { t } = useTranslation();
+
+  // current avatar: instant local preview or from user profile
+  let avatarSrc = localPhotoURL || user?.photoURL;
 
   const handleClearHistory = async () => {
     if (window.confirm(t('profile.confirm_clear_history'))) {
@@ -43,18 +46,52 @@ export const Profile = () => {
     setIsEditingName(false);
   };
 
+  // Compress image to max 400x400 and return base64 string
+  const compressImage = (file) => new Promise((resolve, reject) => {
+    const MAX_SIZE = 400;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(MAX_SIZE / img.width, MAX_SIZE / img.height, 1);
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
   const handleAvatarChange = async (e) => {
     let file = e.target.files[0];
     if (!file || !user) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert(t('profile.invalid_file_type'));
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      alert(t('profile.file_too_large'));
+      return;
+    }
+
+    // Instant local preview
+    let localURL = URL.createObjectURL(file);
+    setLocalPhotoURL(localURL);
     setUploading(true);
     try {
-      let storageRef = ref(storage, `avatars/${user.uid}`);
-      await uploadBytes(storageRef, file);
-      let url = await getDownloadURL(storageRef);
-      await updateUserProfile({ photoURL: url });
+      // Compress and save as base64 in Firestore (free, no Storage needed)
+      const base64 = await compressImage(file);
+      await updateUserProfile({ photoURL: base64 });
+      setLocalPhotoURL(null);
     } catch (error) {
-      console.error('Upload error:', error);
-      alert('Ошибка при загрузке фото. Проверьте правила Storage.');
+      setLocalPhotoURL(null);
+      console.error('Avatar error:', error);
     } finally {
       setUploading(false);
     }
@@ -176,7 +213,7 @@ export const Profile = () => {
         <div className="glass p-6 rounded-3xl text-center space-y-4">
           <div className="relative w-24 h-24 mx-auto group">
             <img 
-              src={user.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'} 
+              src={avatarSrc || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'} 
               className="w-24 h-24 rounded-full border-4 border-white/5 object-cover" 
               alt="User"
             />

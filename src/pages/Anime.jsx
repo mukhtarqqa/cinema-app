@@ -34,7 +34,7 @@ export const AnimePage = () => {
         let data = await anilibriaService.search(query);
         result = { data: data, totalPages: 1 };
       } else {
-        result = await anilibriaService.getReleases(p, 48, genreId || null);
+        result = await anilibriaService.getReleases(p, 24, genreId || null);
       }
       setAnimes(result.data || []);
       setTotalPages(result.totalPages || 1);

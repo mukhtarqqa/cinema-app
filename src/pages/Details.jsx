@@ -10,7 +10,7 @@ import Hls from 'hls.js';
 import { motion } from 'motion/react';
 import { ReviewSection } from '../components/ReviewSection.jsx';
 import { useTranslation } from 'react-i18next';
-import { addToHistory, addToWatchLater } from '../services/contentService.js';
+import { addToHistory, addToWatchLater, getHistoryItem } from '../services/contentService.js';
 
 export const Details = ({ type }) => {
   let { id } = useParams();
@@ -44,6 +44,9 @@ export const Details = ({ type }) => {
         } else {
           let anime = await anilibriaService.getDetails(id);
           setData(anime);
+          // Restore last watched episode progress
+          let saved = await getHistoryItem(id);
+          if (saved?.lastEpisode != null) setSelectedEpisode(saved.lastEpisode);
           addToHistory(anime, 'anime');
         }
       } catch (error) {
@@ -247,7 +250,10 @@ export const Details = ({ type }) => {
                   {data.episodes?.map((ep, idx) => (
                     <button 
                       key={ep.id}
-                      onClick={() => setSelectedEpisode(idx)}
+                      onClick={() => {
+                        setSelectedEpisode(idx);
+                        addToHistory(data, 'anime', idx);
+                      }}
                       className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${selectedEpisode === idx ? 'bg-[var(--color-accent)] text-white' : 'glass hover:bg-white/10'}`}
                     >
                       {ep.ordinal} {t('details.episode')}

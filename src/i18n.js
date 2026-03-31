@@ -87,7 +87,9 @@ let resources = {
         "logout_btn": "Шығу",
         "user_placeholder": "Пайдаланушы",
         "clear_history": "Тарихты тазарту",
-        "confirm_clear_history": "Қарау тарихын толығымен жоясыз ба?"
+        "confirm_clear_history": "Қарау тарихын толығымен жоясыз ба?",
+        "invalid_file_type": "Тек сурет файлдарын жүктеуге болады (PNG, JPG, WEBP)",
+        "file_too_large": "Файл өлшемі 2MB аспауы керек"
       }
     }
   },
@@ -175,7 +177,9 @@ let resources = {
         "logout_btn": "Выйти",
         "user_placeholder": "Пользователь",
         "clear_history": "Очистить историю",
-        "confirm_clear_history": "Удалить всю историю просмотров?"
+        "confirm_clear_history": "Удалить всю историю просмотров?",
+        "invalid_file_type": "Допускаются только изображения (PNG, JPG, WEBP)",
+        "file_too_large": "Файл превышает 2MB"
       }
     }
   },
@@ -263,7 +267,9 @@ let resources = {
         "logout_btn": "Logout",
         "user_placeholder": "User",
         "clear_history": "Clear History",
-        "confirm_clear_history": "Delete all viewing history?"
+        "confirm_clear_history": "Delete all viewing history?",
+        "invalid_file_type": "Only image files are allowed (PNG, JPG, WEBP)",
+        "file_too_large": "File size exceeds 2MB limit"
       }
     }
   }

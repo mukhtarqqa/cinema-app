@@ -15,24 +15,38 @@ import {
 } from 'firebase/firestore';
 
 // Добавление в историю просмотров
-export const addToHistory = async (item, type) => {
+export const addToHistory = async (item, type, lastEpisode = null) => {
   if (!auth.currentUser) return;
   const uid = auth.currentUser.uid;
   const itemId = String(item.id);
   
   try {
-    // Используем уникальный ID (UID_ItemID), чтобы избежать дублей на уровне БД
     const docRef = doc(db, 'history', `${uid}_${itemId}`);
-    await setDoc(docRef, {
+    const saveData = {
       uid: uid,
       itemId: itemId,
       title: type === 'movie' ? (item.title || '') : (item.name?.main || item.name || ''),
       poster: type === 'movie' ? (item.poster_path || '') : (item.poster?.src || ''),
       contentType: type,
       watchedAt: serverTimestamp()
-    });
+    };
+    if (lastEpisode !== null) saveData.lastEpisode = lastEpisode;
+    await setDoc(docRef, saveData, { merge: true });
   } catch (error) {
     // Silent fail
+  }
+};
+
+// Получить запись истории для конкретного элемента (для восстановления прогресса)
+export const getHistoryItem = async (itemId) => {
+  if (!auth.currentUser) return null;
+  try {
+    const { getDoc } = await import('firebase/firestore');
+    const docRef = doc(db, 'history', `${auth.currentUser.uid}_${String(itemId)}`);
+    const snap = await getDoc(docRef);
+    return snap.exists() ? snap.data() : null;
+  } catch {
+    return null;
   }
 };
 

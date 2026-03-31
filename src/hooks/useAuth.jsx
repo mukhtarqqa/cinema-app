@@ -42,11 +42,10 @@ export const AuthProvider = ({ children }) => {
         userData = userSnap.data();
       }
       
-      // Объединяем объект авторизации Firebase с данными из нашей базы (ролью)
-      setUser({ ...authUser, role: userData.role || 'user' });
+      // Объединяем: Firestore данные имеют приоритет над Firebase Auth
+      setUser({ ...authUser, ...userData, role: userData.role || 'user' });
     } catch (error) {
       console.error("Ошибка при синхронизации профиля:", error);
-      // Если база упала, хотя бы залогиним как обычного юзера
       setUser(authUser);
     }
   };
@@ -87,9 +86,17 @@ export const AuthProvider = ({ children }) => {
 
   const updateUserProfile = async (data) => {
     if (!auth.currentUser) return;
-    await updateProfile(auth.currentUser, data);
+    // Firebase Auth only supports short string fields — never pass base64 to it
+    const authSafeData = {};
+    if (data.displayName) authSafeData.displayName = data.displayName;
+    if (data.photoURL && !data.photoURL.startsWith('data:')) authSafeData.photoURL = data.photoURL;
+    if (Object.keys(authSafeData).length > 0) {
+      await updateProfile(auth.currentUser, authSafeData);
+    }
+    // Save everything (including base64 photoURL) to Firestore
     const userRef = doc(db, 'users', auth.currentUser.uid);
     await setDoc(userRef, data, { merge: true });
+    // Update local state immediately so UI reflects change without page reload
     setUser(prev => ({ ...prev, ...data }));
   };
 
