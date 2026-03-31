@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { motion } from 'motion/react';
 
-export const MovieCard = ({ movie }) => {
-  const posterUrl = movie.poster_path 
+export let MovieCard = ({ movie }) => {
+  let posterUrl = movie.poster_path 
     ? (movie.poster_path.startsWith('http') ? movie.poster_path : `https://image.tmdb.org/t/p/w500${movie.poster_path}`)
     : 'https://picsum.photos/seed/movie/500/750';
 

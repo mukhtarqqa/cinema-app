@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
-import { Film, Tv, User, LogOut, Mail, ChevronDown } from 'lucide-react';
+import { Film, Tv, User, LogOut, Mail, ChevronDown, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 
-export const Navbar = () => {
-  const { user, loginGoogle, logout } = useAuth();
-  const [showAuthMenu, setShowAuthMenu] = useState(false);
+export let Navbar = () => {
+  let { user, loginGoogle, logout } = useAuth();
+  let [showAuthMenu, setShowAuthMenu] = useState(false);
+  let { t, i18n } = useTranslation();
+
+  let toggleLang = () => {
+    let langs = ['kk', 'ru', 'en'];
+    let currentIndex = langs.indexOf(i18n.language);
+    let nextIndex = (currentIndex + 1) % langs.length;
+    i18n.changeLanguage(langs[nextIndex]);
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass h-16 px-6 flex items-center justify-between border-b border-white/5">
@@ -18,15 +27,20 @@ export const Navbar = () => {
       <div className="flex items-center gap-1 sm:gap-4">
         <NavLink to="/movies" className={({ isActive }) => `flex items-center gap-2 px-4 py-2 rounded-full transition-all ${isActive ? 'bg-white/10 text-white shadow-lg' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
           <Film size={18} />
-          <span className="hidden md:block font-medium text-sm">Фильмдер</span>
+          <span className="hidden md:block font-medium text-sm">{t('navbar.movies')}</span>
         </NavLink>
         <NavLink to="/anime" className={({ isActive }) => `flex items-center gap-2 px-4 py-2 rounded-full transition-all ${isActive ? 'bg-white/10 text-white shadow-lg' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
           <Tv size={18} />
-          <span className="hidden md:block font-medium text-sm">Аниме</span>
+          <span className="hidden md:block font-medium text-sm">{t('navbar.anime')}</span>
         </NavLink>
       </div>
 
       <div className="relative flex items-center gap-4">
+        <button onClick={toggleLang} className="flex items-center gap-1 text-white/60 hover:text-white transition-colors" title="Тілді ауыстыру / Сменить язык">
+          <Globe size={18} />
+          <span className="text-xs font-bold uppercase">{i18n.language}</span>
+        </button>
+
         {user ? (
           <div className="flex items-center gap-2 bg-white/5 p-1 pl-3 rounded-full border border-white/10">
             <span className="text-xs font-medium text-white/60 hidden lg:block">{user.displayName || 'Пайдаланушы'}</span>
@@ -38,7 +52,7 @@ export const Navbar = () => {
             <button 
               onClick={logout} 
               className="p-2 text-white/40 hover:text-red-500 transition-colors"
-              title="Шығу"
+              title={t('navbar.logout')}
             >
               <LogOut size={18} />
             </button>
@@ -50,7 +64,7 @@ export const Navbar = () => {
               className="flex items-center gap-2 bg-white text-black px-5 py-2 rounded-full font-bold text-sm hover:bg-[#ff4d00] hover:text-white transition-all shadow-lg active:scale-95"
             >
               <User size={16} />
-              <span>Кіру</span>
+              <span>{t('navbar.login')}</span>
               <ChevronDown size={14} className={`transition-transform duration-300 ${showAuthMenu ? 'rotate-180' : ''}`} />
             </button>
 
@@ -69,7 +83,7 @@ export const Navbar = () => {
                       className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm font-medium"
                     >
                       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="G" />
-                      Google арқылы кіру
+                      {t('navbar.login_google')}
                     </button>
 
                     <div className="h-px bg-white/5 my-1" />
@@ -80,7 +94,7 @@ export const Navbar = () => {
                       className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-[#ff4d00]/10 text-[#ff4d00] hover:bg-[#ff4d00] hover:text-white transition-all text-sm font-bold"
                     >
                       <Mail size={18} />
-                      Email / Тіркелу
+                      {t('navbar.login_email')}
                     </Link>
                   </motion.div>
                 </>

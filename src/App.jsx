@@ -3,13 +3,16 @@ import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth.jsx';
 import { Navbar } from './components/Navbar.jsx';
 import { Home } from './pages/Home.jsx';
+import { useTranslation } from 'react-i18next';
 import { Movies } from './pages/Movies.jsx';
 import { AnimePage } from './pages/Anime.jsx';
 import { Details } from './pages/Details.jsx';
 import { Favorites } from './pages/Favorites.jsx';
 import { Login } from './pages/Login.jsx'; // Жаңа бетті импорттау
+import { ScrollToTop } from './components/ScrollToTop.jsx';
 
 const App = () => {
+  let { t } = useTranslation();
   return (
     <AuthProvider>
       <div className="min-h-screen relative overflow-x-hidden">
@@ -31,8 +34,10 @@ const App = () => {
         </Routes>
 
         <footer className="py-12 border-t border-white/5 text-center text-white/40 text-sm">
-          <p>© 2026 CINEMA HUB. TMDB мен AniLibria арқылы жұмыс істейді.</p>
+          <p>© 2026 CINEMA HUB. TMDB {t('home.all').toLowerCase()} AniLibria.</p>
         </footer>
+
+        <ScrollToTop />
       </div>
     </AuthProvider>
   );

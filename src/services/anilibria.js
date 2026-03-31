@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const API_BASE = 'https://anilibria.top/api/v1';
+let API_BASE = 'https://anilibria.top/api/v1';
 
-export const anilibriaService = {
+export let anilibriaService = {
   getLatest: async (limit = 20) => {
     try {
       const res = await axios.get(`${API_BASE}/anime/releases/latest`, { params: { limit } });

@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 
-export const AnimeCard = ({ anime }) => {
-  const posterUrl = anime.poster?.optimized?.src 
+export let AnimeCard = ({ anime }) => {
+  let posterUrl = anime.poster?.optimized?.src 
     ? `https://anilibria.top${anime.poster.optimized.src}`
     : `https://anilibria.top${anime.poster?.src}`;
 

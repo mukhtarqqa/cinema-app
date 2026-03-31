@@ -3,27 +3,29 @@ import { db, handleFirestoreError, OperationType } from '../firebase.js';
 import { collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, deleteDoc, doc } from 'firebase/firestore';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { Star, Send, Trash2, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export const ReviewSection = ({ contentId, contentType }) => {
-  const { user, login } = useAuth();
-  const [reviews, setReviews] = useState([]);
-  const [text, setText] = useState('');
-  const [rating, setRating] = useState(10);
+  let { user, login } = useAuth();
+  let [reviews, setReviews] = useState([]);
+  let [text, setText] = useState('');
+  let [rating, setRating] = useState(10);
+  let { t } = useTranslation();
 
   useEffect(() => {
-    const q = query(
+    let q = query(
       collection(db, 'reviews'),
       where('contentId', '==', contentId),
       where('contentType', '==', contentType),
       orderBy('createdAt', 'desc')
     );
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    let unsubscribe = onSnapshot(q, (snapshot) => {
       setReviews(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
     return () => unsubscribe();
   }, [contentId, contentType]);
 
-  const handleSubmit = async (e) => {
+  let handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return login();
     if (!text.trim()) return;
@@ -31,7 +33,7 @@ export const ReviewSection = ({ contentId, contentType }) => {
     try {
       await addDoc(collection(db, 'reviews'), {
         uid: user.uid,
-        authorName: user.displayName || 'Аноним',
+        authorName: user.displayName || t('reviews.anonymous'),
         contentId,
         contentType,
         rating,
@@ -44,7 +46,7 @@ export const ReviewSection = ({ contentId, contentType }) => {
     }
   };
 
-  const deleteReview = async (id) => {
+  let deleteReview = async (id) => {
     try {
       await deleteDoc(doc(db, 'reviews', id));
     } catch (error) {
@@ -54,11 +56,11 @@ export const ReviewSection = ({ contentId, contentType }) => {
 
   return (
     <div className="space-y-8 pt-12 border-t border-white/5 w-full overflow-hidden">
-      <h2 className="text-2xl sm:text-3xl font-display font-bold tracking-tight uppercase">ПІКІРЛЕР</h2>
+      <h2 className="text-2xl sm:text-3xl font-display font-bold tracking-tight uppercase">{t('reviews.title')}</h2>
 
       <form onSubmit={handleSubmit} className="glass p-5 rounded-3xl space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <span className="text-xs font-bold text-white/60 uppercase tracking-widest">Бағалау</span>
+          <span className="text-xs font-bold text-white/60 uppercase tracking-widest">{t('reviews.rating')}</span>
           <div className="flex flex-wrap gap-0.5 sm:gap-1 justify-center">
             {[...Array(10)].map((_, i) => (
               <button 
@@ -73,7 +75,7 @@ export const ReviewSection = ({ contentId, contentType }) => {
           </div>
         </div>
         <textarea 
-          placeholder="Өз ойыңызбен бөлісіңіз..."
+          placeholder={t('reviews.placeholder')}
           value={text}
           onChange={(e) => setText(e.target.value)}
           className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 min-h-[100px] focus:outline-none focus:border-[var(--color-accent)] transition-colors resize-none text-sm"
@@ -81,7 +83,7 @@ export const ReviewSection = ({ contentId, contentType }) => {
         <div className="flex justify-end">
           <button type="submit" className="flex items-center gap-2 bg-[var(--color-accent)] px-6 py-3 rounded-full font-bold hover:bg-[var(--color-accent)]/80 transition-colors w-full sm:w-auto justify-center">
             <Send size={18} />
-            <span>Жіберу</span>
+            <span>{t('reviews.send')}</span>
           </button>
         </div>
       </form>

@@ -10,16 +10,16 @@ dotenv.config();
 // __filename and __dirname are not used in ESM
 
 async function startServer() {
-  const app = express();
-  const PORT = process.env.PORT || 3000;
+  let app = express();
+  let PORT = process.env.PORT || 3000;
 
   app.use(cors());
   app.use(express.json());
 
-  const TMDB_API_KEY = process.env.TMDB_API_KEY;
-  const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+  let TMDB_API_KEY = process.env.TMDB_API_KEY;
+  let TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
-  const MOCK_MOVIES = [
+  let MOCK_MOVIES = [
     { id: 1, title: 'Interstellar', poster_path: '/gEU2QniE6E77NI6lCU6MxlvWiIx.jpg', vote_average: 8.4, release_date: '2014-11-05', overview: 'The adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel and conquer the vast distances involved in an interstellar voyage.' },
     { id: 2, title: 'Inception', poster_path: '/ljsZTbVsrYqSKSdv9pOE9pGPpB7.jpg', vote_average: 8.3, release_date: '2010-07-15', overview: "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life as payment for a task considered to be impossible: 'inception', the implantation of another person's idea into a target's subconscious." },
     { id: 3, title: 'The Dark Knight', poster_path: '/qJ2tW6WMUDr9s1DvdmtbrpIu9B2.jpg', vote_average: 8.5, release_date: '2008-07-16', overview: 'Batman raises the stakes in his war on crime. With the help of Lt. Jim Gordon and District Attorney Harvey Dent, Batman sets out to dismantle the remaining criminal organizations that plague the streets. The partnership proves to be effective, but they soon find themselves prey to a reign of chaos unleashed by a rising criminal mastermind known to the terrified citizens of Gotham as the Joker.' },
@@ -28,7 +28,7 @@ async function startServer() {
     { id: 6, title: 'Fight Club', poster_path: '/pB8BM7pdv9Gv9pI9uI9uI9uI9uI.jpg', vote_average: 8.4, release_date: '1999-10-15', overview: 'A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy. Their concept catches on, with underground "fight clubs" forming in every town, until an eccentric gets in the way and ignites an out-of-control spiral toward oblivion.' }
   ];
 
-  const hasValidKey = () => {
+  let hasValidKey = () => {
     return TMDB_API_KEY && TMDB_API_KEY !== 'YOUR_TMDB_API_KEY';
   };
 
@@ -39,8 +39,12 @@ async function startServer() {
       return res.json(getMockPopular());
     }
     try {
-      const response = await axios.get(`${TMDB_BASE_URL}/movie/popular`, {
-        params: { api_key: TMDB_API_KEY, language: 'en-US', page: req.query.page || 1 }
+      let response = await axios.get(`${TMDB_BASE_URL}/movie/popular`, {
+        params: { 
+          api_key: TMDB_API_KEY, 
+          language: req.query.language || 'ru-RU', 
+          page: req.query.page || 1 
+        }
       });
       res.json(response.data);
     } catch (error) {
@@ -60,7 +64,12 @@ async function startServer() {
     }
     try {
       const response = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
-        params: { api_key: TMDB_API_KEY, query: req.query.query, language: 'en-US', page: req.query.page || 1 }
+        params: { 
+          api_key: TMDB_API_KEY, 
+          query: req.query.query, 
+          language: req.query.language || 'ru-RU', 
+          page: req.query.page || 1 
+        }
       });
       res.json(response.data);
     } catch (error) {
@@ -76,7 +85,10 @@ async function startServer() {
     }
     try {
       const response = await axios.get(`${TMDB_BASE_URL}/genre/movie/list`, {
-        params: { api_key: TMDB_API_KEY, language: 'en-US' }
+        params: { 
+          api_key: TMDB_API_KEY, 
+          language: req.query.language || 'ru-RU' 
+        }
       });
       res.json(response.data);
     } catch (error) {
@@ -104,7 +116,7 @@ async function startServer() {
       const response = await axios.get(`${TMDB_BASE_URL}/discover/movie`, {
         params: { 
           api_key: TMDB_API_KEY, 
-          language: 'en-US', 
+          language: req.query.language || 'ru-RU', 
           page: req.query.page || 1,
           with_genres: req.query.with_genres,
           primary_release_year: req.query.primary_release_year,
@@ -125,14 +137,25 @@ async function startServer() {
       return null;
     };
     if (!hasValidKey()) {
-      const movie = getMockDetails();
+      let movie = getMockDetails();
       if (movie) return res.json(movie);
       return res.status(404).json({ error: 'Movie not found in demo mode' });
     }
     try {
-      const [details, videos] = await Promise.all([
-        axios.get(`${TMDB_BASE_URL}/movie/${req.params.id}`, { params: { api_key: TMDB_API_KEY } }),
-        axios.get(`${TMDB_BASE_URL}/movie/${req.params.id}/videos`, { params: { api_key: TMDB_API_KEY } })
+      let tmdbLang = req.query.language || 'ru-RU';
+      let [details, videos] = await Promise.all([
+        axios.get(`${TMDB_BASE_URL}/movie/${req.params.id}`, { 
+          params: { 
+            api_key: TMDB_API_KEY, 
+            language: tmdbLang 
+          } 
+        }),
+        axios.get(`${TMDB_BASE_URL}/movie/${req.params.id}/videos`, { 
+          params: { 
+            api_key: TMDB_API_KEY, 
+            language: tmdbLang 
+          } 
+        })
       ]);
       res.json({ ...details.data, videos: videos.data.results });
     } catch (error) {

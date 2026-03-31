@@ -7,27 +7,35 @@ import { AnimeCard } from '../components/AnimeCard.jsx';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
 
 // Массив картинок для заднего фона
-const HERO_IMAGES = [
+let HERO_IMAGES = [
   "https://i.pinimg.com/736x/7a/83/40/7a83402d95e085d9f69c14d19156fced.jpg", // Gojo Awakening
   "https://i.pinimg.com/1200x/dc/67/f5/dc67f5587fa604c32fada9ccbe6d65d6.jpg", // New 1
   "https://i.pinimg.com/1200x/09/26/5b/09265b4657418f09a6d7ee7609ebe7f3.jpg"  // New 2
 ];
 
 export const Home = () => {
-  const [movies, setMovies] = useState([]);
-  const [animes, setAnimes] = useState([]);
-  const [isDemo, setIsDemo] = useState(false);
+  let [movies, setMovies] = useState([]);
+  let [animes, setAnimes] = useState([]);
+  let [isDemo, setIsDemo] = useState(false);
+  let { t, i18n } = useTranslation();
   
+  let getTMDBLanguage = (lang) => {
+    if (lang === 'en') return 'en-US';
+    return 'ru-RU'; // Default for kk and ru
+  };
+
   // Состояние для индекса текущей картинки
-  const [currentImgIndex, setCurrentImgIndex] = useState(0);
+  let [currentImgIndex, setCurrentImgIndex] = useState(0);
 
   useEffect(() => {
-    const fetchData = async () => {
+    let fetchData = async () => {
       try {
-        const [movieData, animeData] = await Promise.all([
-          tmdbService.getPopular(),
+        let tmdbLang = getTMDBLanguage(i18n.language);
+        let [movieData, animeData] = await Promise.all([
+          tmdbService.getPopular(1, tmdbLang),
           anilibriaService.getLatest(6)
         ]);
         setMovies(movieData.results.slice(0, 6));
@@ -38,12 +46,12 @@ export const Home = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [i18n.language]);
 
   // Эффект для автоматической смены картинок
   useEffect(() => {
     // Устанавливаем интервал (например, каждые 5 секунд)
-    const timer = setInterval(() => {
+    let timer = setInterval(() => {
       setCurrentImgIndex((prevIndex) => 
         // Если дошли до конца массива, возвращаемся к 0, иначе +1
         prevIndex === HERO_IMAGES.length - 1 ? 0 : prevIndex + 1
@@ -59,12 +67,12 @@ export const Home = () => {
       {isDemo && (
         <div className="mx-2 bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex items-center gap-4 text-amber-400">
           <AlertCircle size={20} />
-          <p className="text-sm">Демо режимі қосулы.</p>
+          <p className="text-sm">{t('home.demo_mode')}</p>
         </div>
       )}
 
       {/* HERO SECTION */}
-      <section className="relative min-h-[550px] sm:min-h-[750px] rounded-[2.5rem] overflow-hidden flex items-center p-6 sm:p-20 shadow-2xl border border-white/5">
+      <section className="relative min-h-[400px] sm:min-h-[500px] rounded-[2rem] overflow-hidden flex items-center p-6 sm:p-12 shadow-2xl border border-white/5">
         
         {/* БЛОК С ФОНОМ (Слайдшоу) */}
         <div className="absolute inset-0 z-0">
@@ -90,28 +98,30 @@ export const Home = () => {
         </div>
         
         {/* КОНТЕНТ ПОВЕРХ ФОНА (Оставляем без изменений) */}
-        <div className="relative z-10 max-w-4xl space-y-10 w-full">
+        <div className="relative z-10 max-w-4xl space-y-8 w-full">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-[1.8rem] sm:text-7xl lg:text-8xl font-black leading-[1.05] tracking-tighter uppercase"
+            className="text-[2.2rem] sm:text-6xl lg:text-8xl font-black leading-[0.95] tracking-tighter uppercase mb-4 drop-shadow-2xl"
           >
-            АСПАН МЕН ЖЕР <br /> 
-            <span className="text-[#ff4d00] whitespace-nowrap">АРАСЫНДА</span> — ТЕК МЕН <br />
-            ҒАНА АСҚАҚПЫН
+            <Trans i18nKey="home.banner_title">
+              АСПАН МЕН ЖЕР <br /> 
+              <span className="text-[#ff4d00] whitespace-nowrap">АРАСЫНДА</span> — ТЕК МЕН <br />
+              ҒАНА АСҚАҚПЫН
+            </Trans>
           </motion.h1>
 
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="space-y-4"
+            className="space-y-2"
           >
-            <p className="text-white/70 text-lg sm:text-2xl font-medium leading-relaxed max-w-2xl border-l-2 border-[#ff4d00]/50 pl-6">
-              "Среди неба и земли, я один достоин чести."
+            <p className="text-white/40 text-sm sm:text-base lg:text-xl italic font-medium leading-relaxed max-w-2xl border-l-[3px] border-[#ff4d00] pl-6 py-1">
+              "Throughout heaven and earth, I alone am the honored one."
             </p>
-            <p className="text-sm sm:text-base font-bold text-[#ff4d00] pl-6 uppercase tracking-widest">
-              — Годжо Сатору
+            <p className="text-[10px] sm:text-xs font-black text-[#ff4d00]/80 pl-7 uppercase tracking-[0.3em]" data-no-translate="true">
+              — Satoru Gojo
             </p>
           </motion.div>
 
@@ -119,13 +129,13 @@ export const Home = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="flex flex-col sm:flex-row gap-5 pt-4"
+            className="flex flex-col sm:flex-row gap-4 pt-2"
           >
-            <Link to="/movies" className="bg-[#ff4d00] text-white px-14 py-4 rounded-full font-bold text-sm uppercase tracking-widest text-center shadow-2xl shadow-[#ff4d00]/30 hover:scale-105 transition-all active:scale-95">
-              Фильмдерді көру
+            <Link to="/movies" className="bg-[#ff4d00] text-white px-10 py-3 rounded-full font-bold text-sm uppercase tracking-widest text-center shadow-2xl shadow-[#ff4d00]/30 hover:scale-105 transition-all active:scale-95">
+              {t('home.watch_movies')}
             </Link>
-            <Link to="/anime" className="bg-white/5 backdrop-blur-md border border-white/10 text-white px-14 py-4 rounded-full font-bold text-sm uppercase tracking-widest text-center hover:bg-white/10 transition-all active:scale-95">
-              Аниме көру
+            <Link to="/anime" className="bg-white/5 backdrop-blur-md border border-white/10 text-white px-10 py-3 rounded-full font-bold text-sm uppercase tracking-widest text-center hover:bg-white/10 transition-all active:scale-95">
+              {t('home.watch_anime')}
             </Link>
           </motion.div>
         </div>
@@ -134,9 +144,9 @@ export const Home = () => {
       {/* ТАНЫМАЛ СЕКЦИЯЛАР (Без изменений) */}
       <section className="px-3 sm:px-0 space-y-8">
         <div className="flex items-center justify-between border-b border-white/5 pb-4">
-          <h2 className="text-2xl font-bold uppercase tracking-tight">Танымал фильмдер</h2>
+          <h2 className="text-2xl font-bold uppercase tracking-tight">{t('home.popular_movies')}</h2>
           <Link to="/movies" className="flex items-center gap-1 text-white/40 hover:text-white transition-colors">
-            <span className="text-[10px] font-bold uppercase tracking-widest">Барлығы</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest">{t('home.all')}</span>
             <ChevronRight size={14} />
           </Link>
         </div>
@@ -149,9 +159,9 @@ export const Home = () => {
 
       <section className="px-3 sm:px-0 space-y-8">
         <div className="flex items-center justify-between border-b border-white/5 pb-4">
-          <h2 className="text-2xl font-bold uppercase tracking-tight">Соңғы аниме</h2>
+          <h2 className="text-2xl font-bold uppercase tracking-tight">{t('home.latest_anime')}</h2>
           <Link to="/anime" className="flex items-center gap-1 text-white/40 hover:text-white transition-colors">
-            <span className="text-[10px] font-bold uppercase tracking-widest">Барлығы</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest">{t('home.all')}</span>
             <ChevronRight size={14} />
           </Link>
         </div>

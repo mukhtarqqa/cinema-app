@@ -16,15 +16,15 @@ import {
 } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 
-const app = initializeApp(firebaseConfig);
+let app = initializeApp(firebaseConfig);
 
-export const auth = getAuth(app);
+export let auth = getAuth(app);
 setPersistence(auth, browserLocalPersistence).catch(err => console.error(err));
 
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
-export const googleProvider = new GoogleAuthProvider();
+export let db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export let googleProvider = new GoogleAuthProvider();
 
-export const OperationType = {
+export let OperationType = {
   CREATE: 'create',
   UPDATE: 'update',
   DELETE: 'delete',
@@ -34,7 +34,7 @@ export const OperationType = {
 };
 
 export function handleFirestoreError(error, operationType, path) {
-  const errInfo = {
+  let errInfo = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: { userId: auth.currentUser?.uid, email: auth.currentUser?.email },
     operationType,

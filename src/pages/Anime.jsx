@@ -2,20 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { anilibriaService } from '../services/anilibria.js';
 import { AnimeCard } from '../components/AnimeCard.jsx';
 import { Search, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export const AnimePage = () => {
-  const [animes, setAnimes] = useState([]);
-  const [genres, setGenres] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState('');
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  let [animes, setAnimes] = useState([]);
+  let [genres, setGenres] = useState([]);
+  let [loading, setLoading] = useState(true);
+  let [searchQuery, setSearchQuery] = useState('');
+  let [selectedGenre, setSelectedGenre] = useState('');
+  let [page, setPage] = useState(1);
+  let [totalPages, setTotalPages] = useState(1);
+  let { t } = useTranslation();
 
   useEffect(() => {
-    const fetchGenres = async () => {
+    let fetchGenres = async () => {
       try {
-        const data = await anilibriaService.getGenres();
+        let data = await anilibriaService.getGenres();
         setGenres(data || []);
       } catch (error) {
         console.error('Failed to fetch genres', error);
@@ -24,15 +26,15 @@ export const AnimePage = () => {
     fetchGenres();
   }, []);
 
-  const fetchAnime = async (query = '', p = 1, genreId = '') => {
+  let fetchAnime = async (query = '', p = 1, genreId = '') => {
     setLoading(true);
     try {
       let result;
       if (query) {
-        const data = await anilibriaService.search(query);
-        result = { data, totalPages: 1 };
+        let data = await anilibriaService.search(query);
+        result = { data: data, totalPages: 1 };
       } else {
-        result = await anilibriaService.getReleases(p, 24, genreId || null);
+        result = await anilibriaService.getReleases(p, 48, genreId || null);
       }
       setAnimes(result.data || []);
       setTotalPages(result.totalPages || 1);
@@ -47,7 +49,7 @@ export const AnimePage = () => {
     fetchAnime(searchQuery, page, selectedGenre);
   }, [page, selectedGenre, searchQuery]);
 
-  const handleSearch = (e) => {
+  let handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
     fetchAnime(searchQuery, 1, selectedGenre);
@@ -58,14 +60,14 @@ export const AnimePage = () => {
   return (
     <div className="pt-24 pb-12 px-6 max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight uppercase">АНИМЕ</h1>
+        <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight uppercase">{t('anime.title')}</h1>
         
         <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
           <form onSubmit={handleSearch} className="relative w-full md:w-80">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={20} />
             <input 
               type="text" 
-              placeholder="Аниме іздеу..."
+              placeholder={t('anime.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 focus:outline-none focus:border-[var(--color-accent)] transition-colors text-sm sm:text-base"
@@ -80,7 +82,7 @@ export const AnimePage = () => {
             }}
             className="bg-white/5 border border-white/10 rounded-full py-3 px-6 pr-10 focus:outline-none focus:border-[var(--color-accent)] transition-colors appearance-none cursor-pointer w-full sm:w-auto min-w-fit whitespace-nowrap text-sm sm:text-base"
           >
-            <option value="" className="bg-[#0a0502]">Барлық жанрлар</option>
+            <option value="" className="bg-[#0a0502]">{t('anime.all_genres')}</option>
             {genres.map((g, idx) => {
               const name = typeof g === 'string' ? g : g.name;
               const id = typeof g === 'string' ? idx : g.id;
@@ -106,7 +108,7 @@ export const AnimePage = () => {
 
       {!loading && filteredAnimes.length === 0 && (
         <div className="h-[50vh] flex items-center justify-center text-white/40 text-center px-4">
-          Іздеуге немесе жанрға сәйкес аниме табылмады.
+          {t('anime.not_found')}
         </div>
       )}
 
@@ -117,17 +119,17 @@ export const AnimePage = () => {
             disabled={page === 1}
             className="glass w-full sm:w-auto px-8 py-3 rounded-full font-bold disabled:opacity-30 hover:bg-white/10 transition-colors"
           >
-            Алдыңғы
+            {t('anime.prev')}
           </button>
           <span className="font-mono text-white/60">
-            Бет {page} / {totalPages}
+            {t('anime.page')} {page} / {totalPages}
           </span>
           <button 
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
             className="glass w-full sm:w-auto px-8 py-3 rounded-full font-bold disabled:opacity-30 hover:bg-white/10 transition-colors"
           >
-            Келесі
+            {t('anime.next')}
           </button>
         </div>
       )}

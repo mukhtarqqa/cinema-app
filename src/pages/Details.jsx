@@ -9,28 +9,36 @@ import { Star, Heart, Play, Loader2, Calendar, Clock, Tag, AlertCircle } from 'l
 import Hls from 'hls.js';
 import { motion } from 'motion/react';
 import { ReviewSection } from '../components/ReviewSection.jsx';
+import { useTranslation } from 'react-i18next';
 
 export const Details = ({ type }) => {
-  const { id } = useParams();
-  const { user, login } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [favoriteId, setFavoriteId] = useState(null);
-  const [selectedEpisode, setSelectedEpisode] = useState(0);
-  const [isDemo, setIsDemo] = useState(false);
-  const videoRef = useRef(null);
+  let { id } = useParams();
+  let { user, login } = useAuth();
+  let [loading, setLoading] = useState(true);
+  let [data, setData] = useState(null);
+  let [isFavorite, setIsFavorite] = useState(false);
+  let [favoriteId, setFavoriteId] = useState(null);
+  let [selectedEpisode, setSelectedEpisode] = useState(0);
+  let [isDemo, setIsDemo] = useState(false);
+  let videoRef = useRef(null);
+  let { t, i18n } = useTranslation();
+
+  let getTMDBLanguage = (lang) => {
+    if (lang === 'en') return 'en-US';
+    return 'ru-RU'; // Default for kk and ru
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
+    let fetchData = async () => {
       setLoading(true);
       try {
         if (type === 'movie') {
-          const movie = await tmdbService.getDetails(id);
+          let tmdbLang = getTMDBLanguage(i18n.language);
+          let movie = await tmdbService.getDetails(id, tmdbLang);
           setData(movie);
           setIsDemo(!!movie.is_demo);
         } else {
-          const anime = await anilibriaService.getDetails(id);
+          let anime = await anilibriaService.getDetails(id);
           setData(anime);
         }
       } catch (error) {
@@ -40,12 +48,12 @@ export const Details = ({ type }) => {
       }
     };
     fetchData();
-  }, [id, type]);
+  }, [id, type, i18n.language]);
 
   useEffect(() => {
     if (!user || !id) return;
-    const q = query(collection(db, 'favorites'), where('uid', '==', user.uid), where('contentId', '==', id), where('contentType', '==', type));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    let q = query(collection(db, 'favorites'), where('uid', '==', user.uid), where('contentId', '==', id), where('contentType', '==', type));
+    let unsubscribe = onSnapshot(q, (snapshot) => {
       if (!snapshot.empty) {
         setIsFavorite(true);
         setFavoriteId(snapshot.docs[0].id);
@@ -57,7 +65,7 @@ export const Details = ({ type }) => {
     return () => unsubscribe();
   }, [user, id, type]);
 
-  const toggleFavorite = async () => {
+  let toggleFavorite = async () => {
     if (!user) return login();
     try {
       if (isFavorite && favoriteId) {
@@ -79,12 +87,12 @@ export const Details = ({ type }) => {
 
   useEffect(() => {
     if (type === 'anime' && data?.episodes?.[selectedEpisode] && videoRef.current) {
-      const ep = data.episodes[selectedEpisode];
-      const hlsUrl = ep.hls_1080 || ep.hls_720 || ep.hls_480;
+      let ep = data.episodes[selectedEpisode];
+      let hlsUrl = ep.hls_1080 || ep.hls_720 || ep.hls_480;
       if (hlsUrl) {
-        const video = videoRef.current;
+        let video = videoRef.current;
         if (Hls.isSupported()) {
-          const hls = new Hls();
+          let hls = new Hls();
           hls.loadSource(hlsUrl);
           hls.attachMedia(video);
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
@@ -100,9 +108,9 @@ export const Details = ({ type }) => {
     </div>
   );
 
-  if (!data) return <div className="pt-32 text-center">Мазмұн табылмады.</div>;
+  if (!data) return <div className="pt-32 text-center">{t('details.not_found')}</div>;
 
-  const backdropUrl = type === 'movie' 
+  let backdropUrl = type === 'movie' 
     ? (data.backdrop_path.startsWith('http') ? data.backdrop_path : `https://image.tmdb.org/t/p/original${data.backdrop_path}`)
     : `https://anilibria.top${data.poster?.src}`;
 
@@ -111,7 +119,7 @@ export const Details = ({ type }) => {
       {isDemo && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] bg-amber-500/10 border border-amber-500/20 rounded-full px-6 py-2 flex items-center gap-3 text-amber-400 backdrop-blur-md">
           <AlertCircle size={16} />
-          <p className="text-xs font-bold uppercase tracking-widest">Демо режимі</p>
+          <p className="text-xs font-bold uppercase tracking-widest">{t('details.demo_mode')}</p>
         </div>
       )}
       
@@ -142,7 +150,7 @@ export const Details = ({ type }) => {
             className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold transition-all ${isFavorite ? 'bg-white text-black' : 'glass text-white hover:bg-white/10'}`}
           >
             <Heart size={20} fill={isFavorite ? 'currentColor' : 'none'} />
-            {isFavorite ? 'Таңдаулыларда' : 'Таңдаулыларға қосу'}
+            {isFavorite ? t('details.in_favorites') : t('details.add_to_favorites')}
           </button>
         </div>
 
@@ -168,7 +176,7 @@ export const Details = ({ type }) => {
               {type === 'movie' && data.runtime && (
                 <div className="flex items-center gap-1.5">
                   <Clock size={18} />
-                  <span>{data.runtime} мин</span>
+                  <span>{data.runtime} {t('details.min')}</span>
                 </div>
               )}
               <div className="flex items-center gap-1.5">
@@ -185,7 +193,7 @@ export const Details = ({ type }) => {
           <div className="space-y-6 pt-8 border-t border-white/5">
             <h2 className="text-2xl font-display font-bold tracking-tight flex items-center gap-2 uppercase">
               <Play size={24} className="text-[var(--color-accent)]" />
-              ҚАЗІР КӨРУ
+              {t('details.watch_now')}
             </h2>
 
             {type === 'anime' ? (
@@ -200,7 +208,7 @@ export const Details = ({ type }) => {
                       onClick={() => setSelectedEpisode(idx)}
                       className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${selectedEpisode === idx ? 'bg-[var(--color-accent)] text-white' : 'glass hover:bg-white/10'}`}
                     >
-                      {ep.ordinal} БӨЛІМ
+                      {ep.ordinal} {t('details.episode')}
                     </button>
                   ))}
                 </div>
@@ -215,7 +223,7 @@ export const Details = ({ type }) => {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-white/40">
-                    Трейлер қолжетімсіз.
+                    {t('details.no_trailer')}
                   </div>
                 )}
               </div>

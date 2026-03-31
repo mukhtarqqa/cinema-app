@@ -7,16 +7,16 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
-const AuthContext = createContext(undefined);
+let AuthContext = createContext(undefined);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+export let AuthProvider = ({ children }) => {
+  let [user, setUser] = useState(null);
+  let [loading, setLoading] = useState(true);
 
-  const saveUserToDb = async (u) => {
+  let saveUserToDb = async (u) => {
     try {
-      const ref = doc(db, 'users', u.uid);
-      const snap = await getDoc(ref);
+      let ref = doc(db, 'users', u.uid);
+      let snap = await getDoc(ref);
       if (!snap.exists()) {
         await setDoc(ref, {
           uid: u.uid,
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
+    let unsub = onAuthStateChanged(auth, (u) => {
       if (u) {
         setUser(u);
         saveUserToDb(u); 
@@ -44,25 +44,25 @@ export const AuthProvider = ({ children }) => {
     return () => unsub();
   }, []);
 
-  const loginGoogle = () => signInWithPopup(auth, googleProvider);
+  let loginGoogle = () => signInWithPopup(auth, googleProvider);
 
-  const resetPassword = (email) => sendPasswordResetEmail(auth, email);
+  let resetPassword = (email) => sendPasswordResetEmail(auth, email);
   
-  const verifyEmail = () => {
+  let verifyEmail = () => {
     if (auth.currentUser) return sendEmailVerification(auth.currentUser);
   };
 
-  const loginEmail = (email, password) => signInWithEmailAndPassword(auth, email, password);
+  let loginEmail = (email, password) => signInWithEmailAndPassword(auth, email, password);
 
-  const registerEmail = async (email, password, name) => {
-    const res = await createUserWithEmailAndPassword(auth, email, password);
+  let registerEmail = async (email, password, name) => {
+    let res = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(res.user, { displayName: name });
     await sendEmailVerification(res.user);
     saveUserToDb(res.user);
     return res;
   };
 
-  const logout = () => signOut(auth);
+  let logout = () => signOut(auth);
 
   return (
     <AuthContext.Provider value={{ 
@@ -74,8 +74,8 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
+export let useAuth = () => {
+  let ctx = useContext(AuthContext);
   if (ctx === undefined) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 };
