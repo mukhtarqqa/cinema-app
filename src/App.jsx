@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Movies } from './pages/Movies.jsx';
 import { AnimePage } from './pages/Anime.jsx';
 import { Details } from './pages/Details.jsx';
-import { Favorites } from './pages/Favorites.jsx';
+import { Profile } from './pages/Profile.jsx';
 import { Login } from './pages/Login.jsx'; // Жаңа бетті импорттау
 import { ScrollToTop } from './components/ScrollToTop.jsx';
 
@@ -30,7 +30,7 @@ const App = () => {
           <Route path="/anime" element={<AnimePage />} />
           <Route path="/movie/:id" element={<Details type="movie" />} />
           <Route path="/anime/:id" element={<Details type="anime" />} />
-          <Route path="/favorites" element={<Favorites />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
 
         <footer className="py-12 border-t border-white/5 text-center text-white/40 text-sm">

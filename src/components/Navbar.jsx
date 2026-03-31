@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
-import { Film, Tv, User, LogOut, Mail, ChevronDown, Globe } from 'lucide-react';
+import { Film, Tv, LogOut, Mail, Globe, Menu, Heart, Clock, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 
 export let Navbar = () => {
   let { user, loginGoogle, logout } = useAuth();
-  let [showAuthMenu, setShowAuthMenu] = useState(false);
+  let [showMenu, setShowMenu] = useState(false);
+  let navigate = useNavigate();
   let { t, i18n } = useTranslation();
 
   let toggleLang = () => {
@@ -41,67 +42,93 @@ export let Navbar = () => {
           <span className="text-xs font-bold uppercase">{i18n.language}</span>
         </button>
 
-        {user ? (
-          <div className="flex items-center gap-2 bg-white/5 p-1 pl-3 rounded-full border border-white/10">
-            <span className="text-xs font-medium text-white/60 hidden lg:block">{user.displayName || 'Пайдаланушы'}</span>
-            <img 
-              src={user.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'} 
-              alt="user" 
-              className="w-8 h-8 rounded-full border border-white/10 object-cover" 
-            />
-            <button 
-              onClick={logout} 
-              className="p-2 text-white/40 hover:text-red-500 transition-colors"
-              title={t('navbar.logout')}
-            >
-              <LogOut size={18} />
-            </button>
-          </div>
-        ) : (
-          <div className="relative">
-            <button 
-              onClick={() => setShowAuthMenu(!showAuthMenu)} 
-              className="flex items-center gap-2 bg-white text-black px-5 py-2 rounded-full font-bold text-sm hover:bg-[#ff4d00] hover:text-white transition-all shadow-lg active:scale-95"
-            >
-              <User size={16} />
-              <span>{t('navbar.login')}</span>
-              <ChevronDown size={14} className={`transition-transform duration-300 ${showAuthMenu ? 'rotate-180' : ''}`} />
-            </button>
+        <div className="relative">
+          <button 
+            onClick={() => setShowMenu(!showMenu)} 
+            className="flex items-center justify-center w-10 h-10 hover:bg-white/5 rounded-full transition-colors active:scale-95"
+          >
+            {user ? (
+               <img src={user.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'} className="w-7 h-7 rounded-full border border-white/20 object-cover" alt="User" />
+            ) : (
+               <Menu size={24} className="text-white" />
+            )}
+          </button>
 
-            <AnimatePresence>
-              {showAuthMenu && (
-                <>
-                  <div className="fixed inset-0 z-[-1]" onClick={() => setShowAuthMenu(false)} />
-                  <motion.div 
-                    initial={{ opacity: 0, y: 15, scale: 0.95 }} 
-                    animate={{ opacity: 1, y: 0, scale: 1 }} 
-                    exit={{ opacity: 0, y: 15, scale: 0.95 }} 
-                    className="absolute right-0 mt-4 w-64 bg-[#0f0f0f] border border-white/10 rounded-2xl p-2 shadow-2xl backdrop-blur-xl"
-                  >
-                    <button 
-                      onClick={() => { loginGoogle(); setShowAuthMenu(false); }} 
-                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm font-medium"
-                    >
-                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="G" />
-                      {t('navbar.login_google')}
-                    </button>
+          <AnimatePresence>
+            {showMenu && (
+              <>
+                <div className="fixed inset-0 z-[-1]" onClick={() => setShowMenu(false)} />
+                <motion.div 
+                  initial={{ opacity: 0, y: 15, scale: 0.95 }} 
+                  animate={{ opacity: 1, y: 0, scale: 1 }} 
+                  exit={{ opacity: 0, y: 15, scale: 0.95 }} 
+                  className="absolute right-0 mt-4 w-64 bg-[#0f0f0f] border border-white/10 rounded-2xl p-2 shadow-2xl backdrop-blur-xl"
+                >
+                  {user ? (
+                    <>
+                      <div className="flex items-center gap-3 px-3 py-3 border-b border-white/5 mb-1">
+                         <img src={user.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'} alt="user" className="w-10 h-10 rounded-full" />
+                         <div className="flex-1 min-w-0">
+                           <p className="font-bold text-sm truncate">{user.displayName || 'Пайдаланушы'}</p>
+                           <p className="text-xs text-white/40 truncate">{user.email}</p>
+                         </div>
+                      </div>
 
-                    <div className="h-px bg-white/5 my-1" />
+                      <button 
+                        onClick={() => { setShowMenu(false); navigate('/profile?tab=history'); }}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm font-medium"
+                      >
+                        <User size={18} /> Профиль
+                      </button>
 
-                    <Link 
-                      to="/login" 
-                      onClick={() => setShowAuthMenu(false)} 
-                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-[#ff4d00]/10 text-[#ff4d00] hover:bg-[#ff4d00] hover:text-white transition-all text-sm font-bold"
-                    >
-                      <Mail size={18} />
-                      {t('navbar.login_email')}
-                    </Link>
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
+                      <button 
+                        onClick={() => { setShowMenu(false); navigate('/profile?tab=watchLater'); }}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm font-medium"
+                      >
+                        <Clock size={18} /> Посмотреть позже
+                      </button>
+                      
+                      <button 
+                        onClick={() => { setShowMenu(false); navigate('/profile?tab=favorites'); }}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm font-medium"
+                      >
+                        <Heart size={18} /> Избранное
+                      </button>
+
+                      <div className="h-px bg-white/5 my-1" />
+
+                      <button 
+                        onClick={() => { logout(); setShowMenu(false); }}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 text-red-500 transition-colors text-sm font-bold"
+                      >
+                        <LogOut size={18} /> {t('navbar.logout')}
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button 
+                        onClick={() => { loginGoogle(); setShowMenu(false); }} 
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm font-medium"
+                      >
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="G" />
+                        {t('navbar.login_google')}
+                      </button>
+                      <div className="h-px bg-white/5 my-1" />
+                      <Link 
+                        to="/login" 
+                        onClick={() => setShowMenu(false)} 
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-[#ff4d00]/10 text-[#ff4d00] hover:bg-[#ff4d00] hover:text-white transition-all text-sm font-bold"
+                      >
+                        <Mail size={18} />
+                        {t('navbar.login_email')}
+                      </Link>
+                    </>
+                  )}
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </nav>
   );

@@ -14,6 +14,7 @@ import {
   setDoc, 
   serverTimestamp 
 } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 import firebaseConfig from '../firebase-applet-config.json';
 
 let app = initializeApp(firebaseConfig);
@@ -22,6 +23,7 @@ export let auth = getAuth(app);
 setPersistence(auth, browserLocalPersistence).catch(err => console.error(err));
 
 export let db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export let storage = getStorage(app);
 export let googleProvider = new GoogleAuthProvider();
 
 export let OperationType = {

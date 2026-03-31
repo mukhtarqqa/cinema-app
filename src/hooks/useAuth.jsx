@@ -1,81 +1,121 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db, googleProvider } from '../firebase.js';
 import { 
-  signInWithPopup, signOut, onAuthStateChanged, 
-  signInWithEmailAndPassword, createUserWithEmailAndPassword, 
-  updateProfile, sendPasswordResetEmail, sendEmailVerification 
+  signInWithPopup, 
+  signOut, 
+  onAuthStateChanged, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  updateProfile, 
+  sendPasswordResetEmail, 
+  sendEmailVerification 
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
-let AuthContext = createContext(undefined);
+const AuthContext = createContext(undefined);
 
-export let AuthProvider = ({ children }) => {
-  let [user, setUser] = useState(null);
-  let [loading, setLoading] = useState(true);
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  let saveUserToDb = async (u) => {
+  // Функция для синхронизации данных пользователя с Firestore
+  const syncUserWithDb = async (authUser) => {
     try {
-      let ref = doc(db, 'users', u.uid);
-      let snap = await getDoc(ref);
-      if (!snap.exists()) {
-        await setDoc(ref, {
-          uid: u.uid,
-          email: u.email || '',
-          displayName: u.displayName || 'User',
-          photoURL: u.photoURL || '',
+      const userRef = doc(db, 'users', authUser.uid);
+      const userSnap = await getDoc(userRef);
+      
+      let userData;
+
+      if (!userSnap.exists()) {
+        // Если пользователя нет в базе — создаем его с ролью 'user'
+        userData = {
+          uid: authUser.uid,
+          email: authUser.email || '',
+          displayName: authUser.displayName || 'User',
+          photoURL: authUser.photoURL || '',
+          role: 'user', // Роль по умолчанию
           createdAt: serverTimestamp(),
-        });
+        };
+        await setDoc(userRef, userData);
+      } else {
+        // Если есть — забираем данные (включая роль)
+        userData = userSnap.data();
       }
+      
+      // Объединяем объект авторизации Firebase с данными из нашей базы (ролью)
+      setUser({ ...authUser, role: userData.role || 'user' });
     } catch (error) {
-      console.error("Firestore error:", error);
+      console.error("Ошибка при синхронизации профиля:", error);
+      // Если база упала, хотя бы залогиним как обычного юзера
+      setUser(authUser);
     }
   };
 
   useEffect(() => {
-    let unsub = onAuthStateChanged(auth, (u) => {
-      if (u) {
-        setUser(u);
-        saveUserToDb(u); 
+    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
+      if (authUser) {
+        await syncUserWithDb(authUser);
       } else {
         setUser(null);
       }
       setLoading(false);
     });
-    return () => unsub();
+
+    return () => unsubscribe();
   }, []);
 
-  let loginGoogle = () => signInWithPopup(auth, googleProvider);
+  const loginGoogle = () => signInWithPopup(auth, googleProvider);
 
-  let resetPassword = (email) => sendPasswordResetEmail(auth, email);
-  
-  let verifyEmail = () => {
-    if (auth.currentUser) return sendEmailVerification(auth.currentUser);
-  };
+  const loginEmail = (email, password) => signInWithEmailAndPassword(auth, email, password);
 
-  let loginEmail = (email, password) => signInWithEmailAndPassword(auth, email, password);
-
-  let registerEmail = async (email, password, name) => {
-    let res = await createUserWithEmailAndPassword(auth, email, password);
+  const registerEmail = async (email, password, name) => {
+    const res = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(res.user, { displayName: name });
     await sendEmailVerification(res.user);
-    saveUserToDb(res.user);
+    // Сразу сохраняем в базу
+    await syncUserWithDb(res.user);
     return res;
   };
 
-  let logout = () => signOut(auth);
+  const logout = () => signOut(auth);
+
+  const resetPassword = (email) => sendPasswordResetEmail(auth, email);
+  
+  const verifyEmail = () => {
+    if (auth.currentUser) return sendEmailVerification(auth.currentUser);
+  };
+
+  const updateUserProfile = async (data) => {
+    if (!auth.currentUser) return;
+    await updateProfile(auth.currentUser, data);
+    const userRef = doc(db, 'users', auth.currentUser.uid);
+    await setDoc(userRef, data, { merge: true });
+    setUser(prev => ({ ...prev, ...data }));
+  };
+
+  const value = { 
+    user, 
+    loading, 
+    loginGoogle, 
+    loginEmail, 
+    registerEmail, 
+    logout, 
+    resetPassword, 
+    verifyEmail,
+    updateUserProfile
+  };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, loading, loginGoogle, loginEmail, 
-      registerEmail, logout, resetPassword, verifyEmail 
-    }}>
-      {children}
+    <AuthContext.Provider value={value}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
 
-export let useAuth = () => {
-  let ctx = useContext(AuthContext);
-  if (ctx === undefined) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth должен использоваться внутри AuthProvider');
+  }
+  return context;
 };

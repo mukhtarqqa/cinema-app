@@ -5,11 +5,12 @@ import { anilibriaService } from '../services/anilibria.js';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { db, handleFirestoreError, OperationType } from '../firebase.js';
 import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
-import { Star, Heart, Play, Loader2, Calendar, Clock, Tag, AlertCircle } from 'lucide-react';
+import { Star, Heart, Play, Loader2, Calendar, Clock, Tag, AlertCircle, Plus } from 'lucide-react';
 import Hls from 'hls.js';
 import { motion } from 'motion/react';
 import { ReviewSection } from '../components/ReviewSection.jsx';
 import { useTranslation } from 'react-i18next';
+import { addToHistory, addToWatchLater } from '../services/contentService.js';
 
 export const Details = ({ type }) => {
   let { id } = useParams();
@@ -37,9 +38,11 @@ export const Details = ({ type }) => {
           let movie = await tmdbService.getDetails(id, tmdbLang);
           setData(movie);
           setIsDemo(!!movie.is_demo);
+          addToHistory(movie, 'movie');
         } else {
           let anime = await anilibriaService.getDetails(id);
           setData(anime);
+          addToHistory(anime, 'anime');
         }
       } catch (error) {
         console.error('Failed to fetch details', error);
@@ -133,7 +136,7 @@ export const Details = ({ type }) => {
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="aspect-[2/3] rounded-2xl overflow-hidden glass shadow-2xl"
+            className="w-48 sm:w-64 lg:w-full mx-auto aspect-[2/3] rounded-2xl overflow-hidden glass shadow-2xl"
           >
             <img 
               src={type === 'movie' 
@@ -151,6 +154,17 @@ export const Details = ({ type }) => {
           >
             <Heart size={20} fill={isFavorite ? 'currentColor' : 'none'} />
             {isFavorite ? t('details.in_favorites') : t('details.add_to_favorites')}
+          </button>
+
+          <button 
+            onClick={() => {
+              if (!user) return login();
+              addToWatchLater(data, type);
+            }}
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold transition-all glass text-white hover:bg-white/10 mt-4"
+          >
+            <Plus size={20} />
+            Посмотреть позже
           </button>
         </div>
 

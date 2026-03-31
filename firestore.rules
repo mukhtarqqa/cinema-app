@@ -1,50 +1,68 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper functions
+    
+    // --- Вспомогательные функции ---
     function isAuthenticated() {
       return request.auth != null;
     }
+
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
+
+    // Проверка владельца документа (у тебя в базе используется поле 'uid')
     function isDocOwner() {
-      return isAuthenticated() && request.auth.uid == resource.data.uid;
+      return isAuthenticated() && resource != null && request.auth.uid == resource.data.uid;
     }
+
+    // Проверка на админа (безопасная)
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'user') == 'admin';
+    }
+
+    // Твоя валидация
     function isValidUser(data) {
-      return data.keys().hasAll(['uid', 'email']) &&
-             data.uid == request.auth.uid &&
-             data.email is string &&
-             data.email.size() > 0;
+      return data.keys().hasAll(['uid', 'email']) && data.uid == request.auth.uid;
     }
+
     function isValidFavorite(data) {
-      return data.keys().hasAll(['uid', 'contentId', 'contentType']) &&
-             data.uid == request.auth.uid &&
-             data.contentType in ['movie', 'anime'] &&
-             data.contentId is string;
+      return data.keys().hasAll(['uid', 'contentId', 'contentType']) && data.uid == request.auth.uid;
     }
+
     function isValidReview(data) {
       return data.keys().hasAll(['uid', 'contentId', 'contentType', 'rating', 'text']) &&
              data.uid == request.auth.uid &&
-             data.rating is number && data.rating >= 1 && data.rating <= 10 &&
-             data.text is string && data.text.size() > 0 && data.text.size() < 5000;
+             data.rating is number && data.rating >= 1 && data.rating <= 10;
     }
+
+    // --- Правила коллекций ---
 
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow create, update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow create, update: if isOwner(userId) || isAdmin();
     }
 
     match /favorites/{favoriteId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() && isValidFavorite(request.resource.data);
-      allow delete: if isDocOwner();
+      allow delete: if isDocOwner() || isAdmin();
     }
 
     match /reviews/{reviewId} {
-      allow read: if true; // Reviews are public
+      allow read: if true;
       allow create: if isAuthenticated() && isValidReview(request.resource.data);
-      allow update, delete: if isDocOwner() && isValidReview(request.resource.data);
+      allow update, delete: if isDocOwner() || isAdmin();
+    }
+
+    // Новые коллекции: История и Посмотреть позже
+    match /history/{id} {
+      allow read, write: if isDocOwner() || isAdmin();
+    }
+
+    match /watchLater/{id} {
+      allow read, write: if isDocOwner() || isAdmin();
     }
   }
 }
