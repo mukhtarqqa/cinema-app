@@ -96,14 +96,21 @@ export const ReviewSection = ({ contentId, contentType }) => {
                 <div className="shrink-0 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
                   <User size={18} className="text-white/40" />
                 </div>
-                <div className="min-w-0">
-                  <h4 className="font-bold truncate text-sm">{review.authorName}</h4>
-                  <p className="text-[10px] text-white/40">{review.createdAt?.toDate().toLocaleDateString()}</p>
+                <div className="min-w-0 flex flex-col justify-center">
+                  <h4 className="font-bold truncate text-sm leading-none m-0">{review.authorName}</h4>
+                  <p className="text-[10px] text-white/40 leading-none mt-1">{review.createdAt?.toDate().toLocaleDateString()}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-1 text-yellow-400 font-bold shrink-0 text-sm">
-                <Star size={14} fill="currentColor" />
-                <span>{review.rating}</span>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1 text-yellow-400 font-bold shrink-0 text-sm">
+                  <Star size={14} fill="currentColor" />
+                  <span>{review.rating}</span>
+                </div>
+                {user && (user.uid === review.uid || user.role === 'admin') && (
+                  <button onClick={() => deleteReview(review.id)} className="p-1.5 text-white/40 hover:text-red-500 transition-colors bg-white/5 rounded-full hover:bg-white/10" title="Удалить отзыв">
+                    <Trash2 size={14} />
+                  </button>
+                )}
               </div>
             </div>
             <p className="text-white/80 text-sm leading-relaxed break-words">{review.text}</p>

@@ -4,7 +4,7 @@ import { tmdbService } from '../services/tmdb.js';
 import { anilibriaService } from '../services/anilibria.js';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { db, handleFirestoreError, OperationType } from '../firebase.js';
-import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { Star, Heart, Play, Loader2, Calendar, Clock, Tag, AlertCircle, Plus } from 'lucide-react';
 import Hls from 'hls.js';
 import { motion } from 'motion/react';
@@ -19,6 +19,8 @@ export const Details = ({ type }) => {
   let [data, setData] = useState(null);
   let [isFavorite, setIsFavorite] = useState(false);
   let [favoriteId, setFavoriteId] = useState(null);
+  let [isWatchLater, setIsWatchLater] = useState(false);
+  let [watchLaterId, setWatchLaterId] = useState(null);
   let [selectedEpisode, setSelectedEpisode] = useState(0);
   let [isDemo, setIsDemo] = useState(false);
   let videoRef = useRef(null);
@@ -68,13 +70,29 @@ export const Details = ({ type }) => {
     return () => unsubscribe();
   }, [user, id, type]);
 
+  useEffect(() => {
+    if (!user || !id) return;
+    let q = query(collection(db, 'watchLater'), where('uid', '==', user.uid), where('itemId', '==', id), where('contentType', '==', type));
+    let unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) {
+        setIsWatchLater(true);
+        setWatchLaterId(snapshot.docs[0].id);
+      } else {
+        setIsWatchLater(false);
+        setWatchLaterId(null);
+      }
+    });
+    return () => unsubscribe();
+  }, [user, id, type]);
+
   let toggleFavorite = async () => {
     if (!user) return login();
     try {
       if (isFavorite && favoriteId) {
         await deleteDoc(doc(db, 'favorites', favoriteId));
       } else {
-        await addDoc(collection(db, 'favorites'), {
+        const favId = `${user.uid}_${id}`;
+        await setDoc(doc(db, 'favorites', favId), {
           uid: user.uid,
           contentId: id,
           contentType: type,
@@ -85,6 +103,19 @@ export const Details = ({ type }) => {
       }
     } catch (error) {
       handleFirestoreError(error, isFavorite ? OperationType.DELETE : OperationType.CREATE, 'favorites');
+    }
+  };
+
+  let toggleWatchLater = async () => {
+    if (!user) return login();
+    try {
+      if (isWatchLater && watchLaterId) {
+        await deleteDoc(doc(db, 'watchLater', watchLaterId));
+      } else {
+        await addToWatchLater(data, type);
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -157,14 +188,11 @@ export const Details = ({ type }) => {
           </button>
 
           <button 
-            onClick={() => {
-              if (!user) return login();
-              addToWatchLater(data, type);
-            }}
-            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold transition-all glass text-white hover:bg-white/10 mt-4"
+            onClick={toggleWatchLater}
+            className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold transition-all mt-4 ${isWatchLater ? 'bg-white text-black' : 'glass text-white hover:bg-white/10'}`}
           >
-            <Plus size={20} />
-            Посмотреть позже
+            <Clock size={20} />
+            {isWatchLater ? t('details.in_watch_later') : t('details.add_to_watch_later')}
           </button>
         </div>
 

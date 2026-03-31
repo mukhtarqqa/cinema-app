@@ -69,7 +69,7 @@ export let Navbar = () => {
                       <div className="flex items-center gap-3 px-3 py-3 border-b border-white/5 mb-1">
                          <img src={user.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'} alt="user" className="w-10 h-10 rounded-full" />
                          <div className="flex-1 min-w-0">
-                           <p className="font-bold text-sm truncate">{user.displayName || 'Пайдаланушы'}</p>
+                           <p className="font-bold text-sm truncate">{user.displayName || t('profile.user_placeholder')}</p>
                            <p className="text-xs text-white/40 truncate">{user.email}</p>
                          </div>
                       </div>
@@ -78,21 +78,21 @@ export let Navbar = () => {
                         onClick={() => { setShowMenu(false); navigate('/profile?tab=history'); }}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm font-medium"
                       >
-                        <User size={18} /> Профиль
+                        <User size={18} /> {t('profile.profile')}
                       </button>
 
                       <button 
                         onClick={() => { setShowMenu(false); navigate('/profile?tab=watchLater'); }}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm font-medium"
                       >
-                        <Clock size={18} /> Посмотреть позже
+                        <Clock size={18} /> {t('profile.watch_later')}
                       </button>
                       
                       <button 
                         onClick={() => { setShowMenu(false); navigate('/profile?tab=favorites'); }}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm font-medium"
                       >
-                        <Heart size={18} /> Избранное
+                        <Heart size={18} /> {t('profile.favorites')}
                       </button>
 
                       <div className="h-px bg-white/5 my-1" />

@@ -58,11 +58,13 @@ service cloud.firestore {
 
     // Новые коллекции: История и Посмотреть позже
     match /history/{id} {
-      allow read, write: if isDocOwner() || isAdmin();
+      allow read, update, delete: if isDocOwner() || isAdmin();
+      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid;
     }
 
     match /watchLater/{id} {
-      allow read, write: if isDocOwner() || isAdmin();
+      allow read, update, delete: if isDocOwner() || isAdmin();
+      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid;
     }
   }
 }

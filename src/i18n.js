@@ -47,6 +47,8 @@ let resources = {
         "demo_mode": "Демо режимі",
         "in_favorites": "Таңдаулыларда",
         "add_to_favorites": "Таңдаулыларға қосу",
+        "in_watch_later": "Кейін көру тізімінде",
+        "add_to_watch_later": "Кейін көру",
         "watch_now": "ҚАЗІР КӨРУ",
         "episode": "БӨЛІМ",
         "no_trailer": "Трейлер қолжетімсіз.",
@@ -67,6 +69,25 @@ let resources = {
         "placeholder": "Өз ойыңызбен бөлісіңіз...",
         "send": "Жіберу",
         "anonymous": "Аноним"
+      },
+      "profile": {
+        "history": "Қарау тарихы",
+        "watch_later": "Кейін көру",
+        "favorites": "Таңдаулылар",
+        "my_reviews": "Менің пікірлерім",
+        "profile": "Профиль",
+        "login_required": "Авторизациядан өтіңіз",
+        "go_home": "Басты бетке",
+        "empty": "Тізім бос",
+        "movie_link": "Фильмге / Анимеге",
+        "change_photo": "Суретті өзгерту",
+        "delete_review": "Пікірді жою",
+        "movie": "ФИЛЬМ",
+        "anime": "АНИМЕ",
+        "logout_btn": "Шығу",
+        "user_placeholder": "Пайдаланушы",
+        "clear_history": "Тарихты тазарту",
+        "confirm_clear_history": "Қарау тарихын толығымен жоясыз ба?"
       }
     }
   },
@@ -114,6 +135,8 @@ let resources = {
         "demo_mode": "Демо режим",
         "in_favorites": "В избранном",
         "add_to_favorites": "Добавить в избранное",
+        "in_watch_later": "В списке ожидания",
+        "add_to_watch_later": "Посмотреть позже",
         "watch_now": "СМОТРЕТЬ СЕЙЧАС",
         "episode": "СЕРИЯ",
         "no_trailer": "Трейлер недоступен.",
@@ -134,6 +157,25 @@ let resources = {
         "placeholder": "Поделитесь вашим мнением...",
         "send": "Отправить",
         "anonymous": "Аноним"
+      },
+      "profile": {
+        "history": "История",
+        "watch_later": "Посмотреть позже",
+        "favorites": "Избранное",
+        "my_reviews": "Мои отзывы",
+        "profile": "Профиль",
+        "login_required": "Авторизуйтесь",
+        "go_home": "На главную",
+        "empty": "Список пуст",
+        "movie_link": "К фильму / Аниме",
+        "change_photo": "Изменить фото",
+        "delete_review": "Удалить отзыв",
+        "movie": "ФИЛЬМ",
+        "anime": "АНИМЕ",
+        "logout_btn": "Выйти",
+        "user_placeholder": "Пользователь",
+        "clear_history": "Очистить историю",
+        "confirm_clear_history": "Удалить всю историю просмотров?"
       }
     }
   },
@@ -181,6 +223,8 @@ let resources = {
         "demo_mode": "Demo Mode",
         "in_favorites": "In Favorites",
         "add_to_favorites": "Add to Favorites",
+        "in_watch_later": "In Watch Later",
+        "add_to_watch_later": "Watch Later",
         "watch_now": "WATCH NOW",
         "episode": "EPISODE",
         "no_trailer": "Trailer unavailable.",
@@ -201,6 +245,25 @@ let resources = {
         "placeholder": "Share your thoughts...",
         "send": "Send",
         "anonymous": "Anonymous"
+      },
+      "profile": {
+        "history": "Watch History",
+        "watch_later": "Watch Later",
+        "favorites": "Favorites",
+        "my_reviews": "My Reviews",
+        "profile": "Profile",
+        "login_required": "Please login",
+        "go_home": "Go Home",
+        "empty": "List is empty",
+        "movie_link": "To Movie / Anime",
+        "change_photo": "Change photo",
+        "delete_review": "Delete review",
+        "movie": "MOVIE",
+        "anime": "ANIME",
+        "logout_btn": "Logout",
+        "user_placeholder": "User",
+        "clear_history": "Clear History",
+        "confirm_clear_history": "Delete all viewing history?"
       }
     }
   }

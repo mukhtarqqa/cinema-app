@@ -9,53 +9,51 @@ import {
   doc, 
   serverTimestamp, 
   orderBy,
-  limit 
+  limit,
+  updateDoc,
+  setDoc
 } from 'firebase/firestore';
 
 // Добавление в историю просмотров
 export const addToHistory = async (item, type) => {
   if (!auth.currentUser) return;
+  const uid = auth.currentUser.uid;
+  const itemId = String(item.id);
+  
   try {
-    await addDoc(collection(db, 'history'), {
-      uid: auth.currentUser.uid,
-      itemId: String(item.id),
-      title: item.title || item.name,
-      poster: item.poster_path || '',
+    // Используем уникальный ID (UID_ItemID), чтобы избежать дублей на уровне БД
+    const docRef = doc(db, 'history', `${uid}_${itemId}`);
+    await setDoc(docRef, {
+      uid: uid,
+      itemId: itemId,
+      title: type === 'movie' ? (item.title || '') : (item.name?.main || item.name || ''),
+      poster: type === 'movie' ? (item.poster_path || '') : (item.poster?.src || ''),
       contentType: type,
       watchedAt: serverTimestamp()
     });
   } catch (error) {
-    console.error("History Error:", error);
+    // Silent fail
   }
 };
 
 // Добавление в "Посмотреть позже"
 export const addToWatchLater = async (item, type) => {
   if (!auth.currentUser) return;
-  try {
-    // Проверяем, нет ли уже такого фильма в списке
-    const q = query(
-      collection(db, 'watchLater'),
-      where('uid', '==', auth.currentUser.uid),
-      where('itemId', '==', String(item.id))
-    );
-    const existing = await getDocs(q);
-    if (!existing.empty) {
-      alert("Уже есть в списке!");
-      return;
-    }
+  const uid = auth.currentUser.uid;
+  const itemId = String(item.id);
 
-    await addDoc(collection(db, 'watchLater'), {
-      uid: auth.currentUser.uid,
-      itemId: String(item.id),
-      title: item.title || item.name,
-      poster: item.poster_path || '',
+  try {
+    const docRef = doc(db, 'watchLater', `${uid}_${itemId}`);
+    await setDoc(docRef, {
+      uid: uid,
+      itemId: itemId,
+      title: type === 'movie' ? (item.title || '') : (item.name?.main || item.name || ''),
+      poster: type === 'movie' ? (item.poster_path || '') : (item.poster?.src || ''),
       contentType: type,
       addedAt: serverTimestamp()
     });
-    alert("Добавлено в список ожидания!");
   } catch (error) {
-    console.error("WatchLater Error:", error);
+    // Silent fail
   }
 };
 

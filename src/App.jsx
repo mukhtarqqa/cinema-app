@@ -15,7 +15,7 @@ const App = () => {
   let { t } = useTranslation();
   return (
     <AuthProvider>
-      <div className="min-h-screen relative overflow-x-hidden">
+      <div className="min-h-screen relative overflow-x-hidden flex flex-col">
         <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
           <div className="atmosphere absolute top-[-10%] left-[-10%] w-[50%] h-[50%]" />
           <div className="atmosphere absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] opacity-40" />
@@ -23,15 +23,17 @@ const App = () => {
 
         <Navbar />
         
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} /> {/* Логин бетінің жолы */}
-          <Route path="/movies" element={<Movies />} />
-          <Route path="/anime" element={<AnimePage />} />
-          <Route path="/movie/:id" element={<Details type="movie" />} />
-          <Route path="/anime/:id" element={<Details type="anime" />} />
-          <Route path="/profile" element={<Profile />} />
-        </Routes>
+        <main className="flex-1 w-full">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/movies" element={<Movies />} />
+            <Route path="/anime" element={<AnimePage />} />
+            <Route path="/movie/:id" element={<Details type="movie" />} />
+            <Route path="/anime/:id" element={<Details type="anime" />} />
+            <Route path="/profile" element={<Profile />} />
+          </Routes>
+        </main>
 
         <footer className="py-12 border-t border-white/5 text-center text-white/40 text-sm">
           <p>© 2026 CINEMA HUB. TMDB {t('home.all').toLowerCase()} AniLibria.</p>
