@@ -90,6 +90,21 @@ export default function Reviews({ itemId, currentUser }) {
               <div key={review.id} className="review-card">
                 <div className="review-header">
                   <span className="review-rating">⭐ {review.rating}</span>
+                  <span className="review-date">
+                    {review.createdAt
+                      ? (review.createdAt.toDate
+                          ? review.createdAt.toDate()
+                          : new Date(review.createdAt)
+                        ).toLocaleString('ru-RU', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                        })
+                      : ''}
+                  </span>
                 </div>
                 <p className="review-text">{review.text}</p>
                 {canDelete && (

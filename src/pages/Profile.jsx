@@ -197,7 +197,16 @@ export const Profile = () => {
         </div>
         <p className="text-white/80 text-sm leading-relaxed break-words">{review.text}</p>
         <div className="flex items-center justify-between mt-2">
-          <p className="text-[10px] text-white/40">{review.createdAt?.toDate().toLocaleDateString()}</p>
+          <p className="text-[10px] text-white/40">
+            {review.createdAt?.toDate().toLocaleString('ru-RU', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            })}
+          </p>
           <button onClick={handleDeleteReview} className="p-2 text-white/40 hover:text-red-500 transition-colors bg-white/5 rounded-full hover:bg-white/10" title={t('profile.delete_review')}>
             <Trash2 size={14} />
           </button>

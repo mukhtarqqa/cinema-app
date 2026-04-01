@@ -98,7 +98,16 @@ export const ReviewSection = ({ contentId, contentType }) => {
                 </div>
                 <div className="min-w-0 flex flex-col justify-center">
                   <h4 className="font-bold truncate text-sm leading-none m-0">{review.authorName}</h4>
-                  <p className="text-[10px] text-white/40 leading-none mt-1">{review.createdAt?.toDate().toLocaleDateString()}</p>
+                  <p className="text-[10px] text-white/40 leading-none mt-1">
+                    {review.createdAt?.toDate().toLocaleString('ru-RU', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    })}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
