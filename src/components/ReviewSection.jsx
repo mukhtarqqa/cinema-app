@@ -116,7 +116,7 @@ export const ReviewSection = ({ contentId, contentType }) => {
                   <span>{review.rating}</span>
                 </div>
                 {user && (user.uid === review.uid || user.role === 'admin') && (
-                  <button onClick={() => deleteReview(review.id)} className="p-1.5 text-white/40 hover:text-red-500 transition-colors bg-white/5 rounded-full hover:bg-white/10" title="Удалить отзыв">
+                  <button onClick={() => deleteReview(review.id)} className="p-1.5 text-white/40 hover:text-red-500 transition-colors bg-white/5 rounded-full hover:bg-white/10">
                     <Trash2 size={14} />
                   </button>
                 )}

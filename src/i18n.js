@@ -63,6 +63,19 @@ let resources = {
         "movie": "Фильм",
         "anime": "Аниме"
       },
+      "filter": {
+        "title": "Сұрыптау",
+        "rating": "Рейтинг бойынша",
+        "newest": "Жаңалар бірінші",
+        "oldest": "Ескілер бірінші",
+        "popularity": "Танымалдылық бойынша"
+      },
+      "anime_filter": {
+        "favorites": "Танымал",
+        "likes": "Үздік",
+        "newest": "Жаңалары",
+        "oldest": "Ескілері"
+      },
       "reviews": {
         "title": "ПІКІРЛЕР",
         "rating": "Бағалау",
@@ -152,6 +165,19 @@ let resources = {
         "explore": "Исследовать контент",
         "movie": "Фильм",
         "anime": "Аниме"
+      },
+      "filter": {
+        "title": "Сортировка",
+        "rating": "По рейтингу",
+        "newest": "Сначала новые",
+        "oldest": "Сначала старые",
+        "popularity": "По популярности"
+      },
+      "anime_filter": {
+        "favorites": "Популярные",
+        "likes": "Топ",
+        "newest": "Сначала новые",
+        "oldest": "Сначала старые"
       },
       "reviews": {
         "title": "ОТЗЫВЫ",
@@ -243,6 +269,19 @@ let resources = {
         "movie": "Movie",
         "anime": "Anime"
       },
+      "filter": {
+        "title": "Sort by",
+        "rating": "By Rating",
+        "newest": "Newest First",
+        "oldest": "Oldest First",
+        "popularity": "By Popularity"
+      },
+      "anime_filter": {
+        "favorites": "Favorites",
+        "likes": "Top Rated",
+        "newest": "Newest First",
+        "oldest": "Oldest First"
+      },
       "reviews": {
         "title": "REVIEWS",
         "rating": "Rating",
@@ -280,7 +319,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: "kk", // Default language setup (Kazakh)
+    lng: "kk",
     fallbackLng: "kk",
     interpolation: {
       escapeValue: false 

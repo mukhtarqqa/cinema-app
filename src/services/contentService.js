@@ -1,20 +1,16 @@
 import { db, auth } from '../firebase';
 import { 
   collection, 
-  addDoc, 
   query, 
   where, 
   getDocs, 
-  deleteDoc, 
   doc, 
   serverTimestamp, 
   orderBy,
   limit,
-  updateDoc,
   setDoc
 } from 'firebase/firestore';
 
-// Добавление в историю просмотров
 export const addToHistory = async (item, type, lastEpisode = null) => {
   if (!auth.currentUser) return;
   const uid = auth.currentUser.uid;
@@ -33,11 +29,9 @@ export const addToHistory = async (item, type, lastEpisode = null) => {
     if (lastEpisode !== null) saveData.lastEpisode = lastEpisode;
     await setDoc(docRef, saveData, { merge: true });
   } catch (error) {
-    // Silent fail
   }
 };
 
-// Получить запись истории для конкретного элемента (для восстановления прогресса)
 export const getHistoryItem = async (itemId) => {
   if (!auth.currentUser) return null;
   try {
@@ -50,7 +44,6 @@ export const getHistoryItem = async (itemId) => {
   }
 };
 
-// Добавление в "Посмотреть позже"
 export const addToWatchLater = async (item, type) => {
   if (!auth.currentUser) return;
   const uid = auth.currentUser.uid;
@@ -67,11 +60,9 @@ export const addToWatchLater = async (item, type) => {
       addedAt: serverTimestamp()
     });
   } catch (error) {
-    // Silent fail
   }
 };
 
-// Получение истории пользователя
 export const getUserHistory = async () => {
   if (!auth.currentUser) return [];
   try {

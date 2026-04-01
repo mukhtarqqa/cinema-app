@@ -12,12 +12,14 @@ export let anilibriaService = {
       return [];
     }
   },
-  getReleases: async (page = 1, limit = 24, genreId = null) => {
+  getReleases: async (page = 1, limit = 24, genreId = null, sort = 'year', order = 'desc') => {
     try {
       let url = `${API_BASE}/anime/catalog/releases`;
-      const params = {
-        limit,
+      const params = { 
+        limit, 
         page,
+        order_by: sort,
+        sort_direction: order
       };
 
       if (genreId) {
@@ -25,7 +27,6 @@ export let anilibriaService = {
       }
 
       const res = await axios.get(url, { params });
-      // Both endpoints return { data: Array, meta: { pagination: { total_pages: number } } }
       return {
         data: res.data.data || [],
         totalPages: res.data.meta?.pagination?.total_pages || 1
@@ -39,7 +40,6 @@ export let anilibriaService = {
     if (!query || query.trim().length < 2) return [];
     try {
       const res = await axios.get(`${API_BASE}/app/search/releases`, { params: { query: query.trim() } });
-      // Search returns a plain array
       return res.data || [];
     } catch (error) {
       console.error('Anilibria Search Error:', error.message);

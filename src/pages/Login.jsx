@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Mail, Lock, User, ChevronLeft, AlertCircle } from 'lucide-react';
 
 export const Login = () => {
-  const [view, setView] = useState('email'); // 'email', 'forgot'
+  const [view, setView] = useState('email');
   const [isRegister, setIsRegister] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '', name: '' });
   const [message, setMessage] = useState({ text: '', type: '' });

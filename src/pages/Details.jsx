@@ -5,7 +5,7 @@ import { anilibriaService } from '../services/anilibria.js';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { db, handleFirestoreError, OperationType } from '../firebase.js';
 import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { Star, Heart, Play, Loader2, Calendar, Clock, Tag, AlertCircle, Plus } from 'lucide-react';
+import { Star, Heart, Play, Loader2, Calendar, Clock, Tag, AlertCircle } from 'lucide-react';
 import Hls from 'hls.js';
 import { motion } from 'motion/react';
 import { ReviewSection } from '../components/ReviewSection.jsx';
@@ -28,7 +28,7 @@ export const Details = ({ type }) => {
 
   let getTMDBLanguage = (lang) => {
     if (lang === 'en') return 'en-US';
-    return 'ru-RU'; // Default for kk and ru
+    return 'ru-RU';
   };
 
   useEffect(() => {
@@ -44,7 +44,6 @@ export const Details = ({ type }) => {
         } else {
           let anime = await anilibriaService.getDetails(id);
           setData(anime);
-          // Restore last watched episode progress
           let saved = await getHistoryItem(id);
           if (saved?.lastEpisode != null) setSelectedEpisode(saved.lastEpisode);
           addToHistory(anime, 'anime');
@@ -148,7 +147,7 @@ export const Details = ({ type }) => {
   if (!data) return <div className="pt-32 text-center">{t('details.not_found')}</div>;
 
   let backdropUrl = type === 'movie' 
-    ? (data.backdrop_path.startsWith('http') ? data.backdrop_path : `https://image.tmdb.org/t/p/original${data.backdrop_path}`)
+    ? (data.backdrop_path?.startsWith('http') ? data.backdrop_path : `https://image.tmdb.org/t/p/original${data.backdrop_path}`)
     : `https://anilibria.top${data.poster?.src}`;
 
   return (
@@ -174,7 +173,7 @@ export const Details = ({ type }) => {
           >
             <img 
               src={type === 'movie' 
-                ? (data.poster_path.startsWith('http') ? data.poster_path : `https://image.tmdb.org/t/p/w500${data.poster_path}`) 
+                ? (data.poster_path?.startsWith('http') ? data.poster_path : `https://image.tmdb.org/t/p/w500${data.poster_path}`) 
                 : `https://anilibria.top${data.poster?.src}`} 
               alt={type === 'movie' ? data.title : data.name?.main} 
               className="w-full h-full object-cover"

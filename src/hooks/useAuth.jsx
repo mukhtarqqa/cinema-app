@@ -18,7 +18,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Функция для синхронизации данных пользователя с Firestore
   const syncUserWithDb = async (authUser) => {
     try {
       const userRef = doc(db, 'users', authUser.uid);
@@ -27,25 +26,22 @@ export const AuthProvider = ({ children }) => {
       let userData;
 
       if (!userSnap.exists()) {
-        // Если пользователя нет в базе — создаем его с ролью 'user'
         userData = {
           uid: authUser.uid,
           email: authUser.email || '',
           displayName: authUser.displayName || 'User',
           photoURL: authUser.photoURL || '',
-          role: 'user', // Роль по умолчанию
+          role: 'user',
           createdAt: serverTimestamp(),
         };
         await setDoc(userRef, userData);
       } else {
-        // Если есть — забираем данные (включая роль)
         userData = userSnap.data();
       }
       
-      // Объединяем: Firestore данные имеют приоритет над Firebase Auth
       setUser({ ...authUser, ...userData, role: userData.role || 'user' });
     } catch (error) {
-      console.error("Ошибка при синхронизации профиля:", error);
+      console.error("error syncing profile:", error);
       setUser(authUser);
     }
   };
@@ -71,7 +67,6 @@ export const AuthProvider = ({ children }) => {
     const res = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(res.user, { displayName: name });
     await sendEmailVerification(res.user);
-    // Сразу сохраняем в базу
     await syncUserWithDb(res.user);
     return res;
   };
@@ -86,17 +81,14 @@ export const AuthProvider = ({ children }) => {
 
   const updateUserProfile = async (data) => {
     if (!auth.currentUser) return;
-    // Firebase Auth only supports short string fields — never pass base64 to it
     const authSafeData = {};
     if (data.displayName) authSafeData.displayName = data.displayName;
     if (data.photoURL && !data.photoURL.startsWith('data:')) authSafeData.photoURL = data.photoURL;
     if (Object.keys(authSafeData).length > 0) {
       await updateProfile(auth.currentUser, authSafeData);
     }
-    // Save everything (including base64 photoURL) to Firestore
     const userRef = doc(db, 'users', auth.currentUser.uid);
     await setDoc(userRef, data, { merge: true });
-    // Update local state immediately so UI reflects change without page reload
     setUser(prev => ({ ...prev, ...data }));
   };
 
@@ -122,7 +114,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth должен использоваться внутри AuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

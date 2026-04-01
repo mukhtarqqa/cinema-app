@@ -19,7 +19,6 @@ export const Profile = () => {
   let [localPhotoURL, setLocalPhotoURL] = useState(null);
   let { t } = useTranslation();
 
-  // current avatar: instant local preview or from user profile
   let avatarSrc = localPhotoURL || user?.photoURL;
 
   const handleClearHistory = async () => {
@@ -46,7 +45,6 @@ export const Profile = () => {
     setIsEditingName(false);
   };
 
-  // Compress image to max 400x400 and return base64 string
   const compressImage = (file) => new Promise((resolve, reject) => {
     const MAX_SIZE = 400;
     const reader = new FileReader();
@@ -80,12 +78,10 @@ export const Profile = () => {
       return;
     }
 
-    // Instant local preview
     let localURL = URL.createObjectURL(file);
     setLocalPhotoURL(localURL);
     setUploading(true);
     try {
-      // Compress and save as base64 in Firestore (free, no Storage needed)
       const base64 = await compressImage(file);
       await updateUserProfile({ photoURL: base64 });
       setLocalPhotoURL(null);
@@ -107,7 +103,7 @@ export const Profile = () => {
   useEffect(() => {
     if (!user) return;
     setLoadingData(true);
-    let collName = activeTab; // 'history', 'watchLater', 'favorites', 'reviews'
+    let collName = activeTab;
     let orderField = 'createdAt';
     if (activeTab === 'watchLater') orderField = 'addedAt';
     if (activeTab === 'history') orderField = 'watchedAt';
@@ -217,7 +213,6 @@ export const Profile = () => {
 
   return (
     <div className="pt-24 pb-12 px-6 max-w-7xl mx-auto flex flex-col md:flex-row gap-8">
-      {/* Sidebar sidebar */}
       <div className="w-full md:w-64 space-y-6 shrink-0">
         <div className="glass p-6 rounded-3xl text-center space-y-4">
           <div className="relative w-24 h-24 mx-auto group">
@@ -283,7 +278,6 @@ export const Profile = () => {
         </nav>
       </div>
 
-      {/* Main Content Area */}
       <div className="flex-1 min-w-0 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">

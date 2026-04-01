@@ -8,7 +8,7 @@ import { Movies } from './pages/Movies.jsx';
 import { AnimePage } from './pages/Anime.jsx';
 import { Details } from './pages/Details.jsx';
 import { Profile } from './pages/Profile.jsx';
-import { Login } from './pages/Login.jsx'; // Жаңа бетті импорттау
+import { Login } from './pages/Login.jsx';
 import { ScrollToTop } from './components/ScrollToTop.jsx';
 
 const App = () => {

@@ -7,8 +7,6 @@ import cors from 'cors';
 
 dotenv.config();
 
-// __filename and __dirname are not used in ESM
-
 async function startServer() {
   let app = express();
   let PORT = process.env.PORT || 3000;
@@ -32,7 +30,6 @@ async function startServer() {
     return TMDB_API_KEY && TMDB_API_KEY !== 'YOUR_TMDB_API_KEY';
   };
 
-  // API routes
   app.get('/api/movies/popular', async (req, res) => {
     const getMockPopular = () => ({ results: MOCK_MOVIES, total_pages: 1, total_results: MOCK_MOVIES.length, is_demo: true });
     if (!hasValidKey()) {
@@ -187,8 +184,6 @@ async function startServer() {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 
-  // Global error handler for API routes - MUST be at the end
-  // eslint-disable-next-line no-unused-vars
   app.use('/api', (err, req, res, next) => {
     console.error('API Error:', err);
     res.status(500).json({ error: 'Internal Server Error', details: err.message });
