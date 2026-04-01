@@ -9,9 +9,9 @@ import { Link } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
 
 let HERO_IMAGES = [
-  "https://i.pinimg.com/736x/7a/83/40/7a83402d95e085d9f69c14d19156fced.jpg",
-  "https://i.pinimg.com/1200x/dc/67/f5/dc67f5587fa604c32fada9ccbe6d65d6.jpg",
-  "https://i.pinimg.com/1200x/09/26/5b/09265b4657418f09a6d7ee7609ebe7f3.jpg"
+  "https://i.pinimg.com/736x/be/8f/76/be8f7696365c80435989a85838cc0666.jpg",
+  "https://i.pinimg.com/736x/c1/74/18/c17418fef207f2778a3d133f797aa194.jpg",
+  "https://i.pinimg.com/736x/20/a1/2d/20a12d3ac0c770b6ceea0b85bf3120d0.jpg"
 ];
 
 export const Home = () => {
@@ -64,7 +64,7 @@ export const Home = () => {
         </div>
       )}
 
-      <section className="relative min-h-[400px] sm:min-h-[500px] rounded-[2rem] overflow-hidden flex items-center p-6 sm:p-12 shadow-2xl border border-white/5">
+      <section className="relative min-h-[400px] sm:min-h-[500px] lg:min-h-[450px] lg:h-[55vh] lg:max-h-[600px] rounded-[2rem] overflow-hidden flex items-center p-6 sm:p-12 shadow-2xl border border-white/5">
         
         <div className="absolute inset-0 z-0">
           <AnimatePresence mode="wait">
@@ -72,7 +72,7 @@ export const Home = () => {
               key={currentImgIndex}
               src={HERO_IMAGES[currentImgIndex]} 
               alt={`Hero background ${currentImgIndex}`} 
-              className="absolute inset-0 w-full h-full object-cover object-center opacity-80"
+              className="absolute inset-0 w-full h-full object-cover object-center sm:object-[center_10%] opacity-80"
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.8 }}
               exit={{ opacity: 0 }}
@@ -88,7 +88,7 @@ export const Home = () => {
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-[2.2rem] sm:text-6xl lg:text-8xl font-black leading-[0.95] tracking-tighter uppercase mb-4 drop-shadow-2xl"
+            className="text-[2.2rem] sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tighter uppercase mb-4 drop-shadow-2xl"
           >
             <Trans i18nKey="home.banner_title">
               АСПАН МЕН ЖЕР <br /> 
