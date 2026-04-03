@@ -1,22 +1,33 @@
+# Cinema App (Кино Қосымшасы)
 
-1. Install dependencies:
-   `npm install`
-2. Run the app:
-2. Set [.env.local](.env.local)
-3. Run the app:
+Бұл жоба — фильмдер мен сериалдарды қарауға, іздеуге және сақтауға арналған заманауи веб-қосымша. 
 
-   `npm run dev`
+## Мүмкіндіктері
+- Фильмдер мен анимелерді іздеу және шолу.
+- "Кейін көру" (Watch Later) тізімін жүргізу.
+- Қарау тарихын (History) сақтау.
+- Көптілділік (қазақ тілі қолданылады).
+- Пікірлер және рейтинг жүйесі.
 
-## Deployment to Render
+## Қалай іске қосу керек?
 
-1. Sign up for a Render account at [render.com](https://render.com).
-2. Connect your GitHub repository to Render.
-3. Create a new **Web Service** from your repository.
-4. Configure the service:
-   - **Runtime**: Node.js
-   - **Build Command**: `npm run build`
-   - **Start Command**: `npm start`
-   - **Environment Variables**:
-     - `TMDB_API_KEY`: Your TMDB API key (get from [themoviedb.org](https://www.themoviedb.org/settings/api))
-     - `APP_URL`: This will be automatically set by Render to your service URL
-5. Deploy the service. Render will build and deploy your app automatically.
+1. Жобаны клондаңыз:
+```bash
+git clone https://github.com/mukhtarqqa/cinema-app.git
+cd cinema-app
+```
+
+2. Тәуелділіктерді (dependencies) орнатыңыз:
+```bash
+npm install --legacy-peer-deps
+```
+
+3. `.env` немесе `.env.local` файлын жасап, өз TMDB API кілтіңізді қосыңыз:
+```env
+TMDB_API_KEY="СІЗДІҢ_TMDB_API_КІЛТІҢІЗ"
+```
+
+4. Қосымшаны іске қосыңыз (локальды серверде):
+```bash
+npm run dev
+```
