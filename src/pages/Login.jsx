@@ -38,6 +38,7 @@ export const Login = () => {
       await loginGoogle();
       navigate('/');
     } catch (err) {
+      console.error('Google login error:', err);
       setMessage({ text: 'Google арқылы кіру сәтсіз аяқталды', type: 'error' });
     }
   };

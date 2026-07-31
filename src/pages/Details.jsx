@@ -4,7 +4,7 @@ import { tmdbService } from '../services/tmdb.js';
 import { anilibriaService } from '../services/anilibria.js';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { db, handleFirestoreError, OperationType } from '../firebase.js';
-import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { Star, Heart, Play, Loader2, Calendar, Clock, Tag, AlertCircle } from 'lucide-react';
 import Hls from 'hls.js';
 import { motion } from 'motion/react';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { addReview, getReviews, deleteReview } from '../services/reviewService.js';
 
 export default function Reviews({ itemId, currentUser }) {
@@ -7,20 +7,20 @@ export default function Reviews({ itemId, currentUser }) {
   let [rating, setRating] = useState(5);
   let [loading, setLoading] = useState(false);
 
-  let fetchReviews = async () => {
+  let fetchReviews = useCallback(async () => {
     try {
       let data = await getReviews(itemId);
       setReviews(data);
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [itemId]);
 
   useEffect(() => {
     if (itemId) {
       fetchReviews();
     }
-  }, [itemId]);
+  }, [itemId, fetchReviews]);
 
   let handleSubmit = async (e) => {
     e.preventDefault();

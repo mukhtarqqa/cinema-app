@@ -184,7 +184,7 @@ async function startServer() {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 
-  app.use('/api', (err, req, res, next) => {
+  app.use('/api', (err, req, res, next) => { // eslint-disable-line no-unused-vars
     console.error('API Error:', err);
     res.status(500).json({ error: 'Internal Server Error', details: err.message });
   });

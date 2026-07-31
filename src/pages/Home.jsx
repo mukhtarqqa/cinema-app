@@ -104,7 +104,7 @@ export const Home = () => {
             className="space-y-2"
           >
             <p className="text-white/40 text-sm sm:text-base lg:text-xl italic font-medium leading-relaxed max-w-2xl border-l-[3px] border-[#ff4d00] pl-6 py-1">
-              "Throughout heaven and earth, I alone am the honored one."
+              &ldquo;Throughout heaven and earth, I alone am the honored one.&rdquo;
             </p>
             <p className="text-[10px] sm:text-xs font-black text-[#ff4d00]/80 pl-7 uppercase tracking-[0.3em]" data-no-translate="true">
               — Satoru Gojo

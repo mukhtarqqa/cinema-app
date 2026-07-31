@@ -70,6 +70,7 @@ export const AnimePage = () => {
 
   let sortedAnimes = [...animes];
   if (sortBy === 'favorites') {
+    // Already sorted / no action needed
   } else if (sortBy === 'likes') {
     sortedAnimes.sort((a, b) => (Number(b.added_in_users_favorites) || 0) - (Number(a.added_in_users_favorites) || 0));
   } else if (sortBy === 'newest') {

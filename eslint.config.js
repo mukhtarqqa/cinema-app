@@ -37,10 +37,11 @@ export default [
       ],
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
+      'react-hooks/set-state-in-effect': 'off',
     },
     settings: {
       react: {
-        version: 'detect',
+        version: '19.2.8',
       },
     },
   },
