@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
-import { Film, Tv, LogOut, Mail, Globe, Menu, Heart, Clock, User } from 'lucide-react';
+import { Film, Tv, LogOut, Mail, Globe, Menu, Heart, Clock, User, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,39 +18,80 @@ export let Navbar = () => {
     i18n.changeLanguage(langs[nextIndex]);
   };
 
+  let langLabels = { kk: 'ҚАЗ', ru: 'РУС', en: 'ENG' };
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass h-16 px-6 flex items-center justify-between border-b border-white/5">
-      <Link to="/" className="flex items-center gap-2 group">
-        <div className="w-8 h-8 bg-[#ff4d00] rounded-lg flex items-center justify-center font-display font-bold text-xl group-hover:scale-110 transition-transform">C</div>
-        <span className="font-display font-bold text-xl tracking-tight hidden sm:block">CINEMA HUB</span>
+    <nav className="fixed top-0 left-0 right-0 z-50 h-16 px-4 sm:px-6 flex items-center justify-between border-b border-white/5"
+      style={{ background: 'rgba(10,5,2,0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+    >
+      {/* Logo */}
+      <Link to="/" className="flex items-center gap-2.5 group shrink-0">
+        <div className="w-8 h-8 rounded-xl flex items-center justify-center font-display font-bold text-xl group-hover:scale-110 transition-transform glow-accent"
+          style={{ background: 'linear-gradient(135deg, #ff4d00, #ff8c42)' }}
+        >
+          C
+        </div>
+        <span className="font-display font-bold text-lg tracking-tight hidden sm:block">
+          CINEMA <span className="gradient-text">HUB</span>
+        </span>
       </Link>
 
-      <div className="flex items-center gap-1 sm:gap-4">
-        <NavLink to="/movies" className={({ isActive }) => `flex items-center gap-2 px-4 py-2 rounded-full transition-all ${isActive ? 'bg-white/10 text-white shadow-lg' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
-          <Film size={18} />
-          <span className="hidden md:block font-medium text-sm">{t('navbar.movies')}</span>
+      {/* Nav links */}
+      <div className="flex items-center gap-1">
+        <NavLink
+          to="/movies"
+          className={({ isActive }) =>
+            `flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+              isActive
+                ? 'bg-[#ff4d00]/15 text-[#ff4d00] border border-[#ff4d00]/20'
+                : 'text-white/50 hover:text-white hover:bg-white/5'
+            }`
+          }
+        >
+          <Film size={16} />
+          <span className="hidden md:block">{t('navbar.movies')}</span>
         </NavLink>
-        <NavLink to="/anime" className={({ isActive }) => `flex items-center gap-2 px-4 py-2 rounded-full transition-all ${isActive ? 'bg-white/10 text-white shadow-lg' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
-          <Tv size={18} />
-          <span className="hidden md:block font-medium text-sm">{t('navbar.anime')}</span>
+        <NavLink
+          to="/anime"
+          className={({ isActive }) =>
+            `flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+              isActive
+                ? 'bg-[#ff4d00]/15 text-[#ff4d00] border border-[#ff4d00]/20'
+                : 'text-white/50 hover:text-white hover:bg-white/5'
+            }`
+          }
+        >
+          <Tv size={16} />
+          <span className="hidden md:block">{t('navbar.anime')}</span>
         </NavLink>
       </div>
 
-      <div className="relative flex items-center gap-4">
-        <button onClick={toggleLang} className="flex items-center gap-1 text-white/60 hover:text-white transition-colors" title="Тілді ауыстыру / Сменить язык">
-          <Globe size={18} />
-          <span className="text-xs font-bold uppercase">{i18n.language}</span>
+      {/* Right side */}
+      <div className="relative flex items-center gap-2 sm:gap-3">
+        {/* Language toggle */}
+        <button
+          onClick={toggleLang}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all text-white/70 hover:text-white"
+          title="Тілді ауыстыру"
+        >
+          <Globe size={14} />
+          <span className="text-[11px] font-bold tracking-wider">{langLabels[i18n.language] || i18n.language.toUpperCase()}</span>
         </button>
 
+        {/* User menu */}
         <div className="relative">
-          <button 
-            onClick={() => setShowMenu(!showMenu)} 
-            className="flex items-center justify-center w-10 h-10 hover:bg-white/5 rounded-full transition-colors active:scale-95"
+          <button
+            onClick={() => setShowMenu(!showMenu)}
+            className="flex items-center justify-center w-9 h-9 hover:bg-white/5 rounded-full transition-colors active:scale-95 border border-white/10"
           >
             {user ? (
-               <img src={user.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'} className="w-7 h-7 rounded-full border border-white/20 object-cover" alt="User" />
+              <img
+                src={user.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
+                className="w-7 h-7 rounded-full object-cover"
+                alt="User"
+              />
             ) : (
-               <Menu size={24} className="text-white" />
+              showMenu ? <X size={18} className="text-white" /> : <Menu size={18} className="text-white" />
             )}
           </button>
 
@@ -58,68 +99,71 @@ export let Navbar = () => {
             {showMenu && (
               <>
                 <div className="fixed inset-0 z-[-1]" onClick={() => setShowMenu(false)} />
-                <motion.div 
-                  initial={{ opacity: 0, y: 15, scale: 0.95 }} 
-                  animate={{ opacity: 1, y: 0, scale: 1 }} 
-                  exit={{ opacity: 0, y: 15, scale: 0.95 }} 
-                  className="absolute right-0 mt-4 w-64 bg-[#0f0f0f] border border-white/10 rounded-2xl p-2 shadow-2xl backdrop-blur-xl"
+                <motion.div
+                  initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 12, scale: 0.95 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  className="absolute right-0 mt-3 w-64 rounded-2xl p-2 shadow-2xl border border-white/10 overflow-hidden"
+                  style={{ background: 'rgba(15,12,10,0.97)', backdropFilter: 'blur(30px)' }}
                 >
                   {user ? (
                     <>
-                      <div className="flex items-center gap-3 px-3 py-3 border-b border-white/5 mb-1">
-                         <img src={user.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'} alt="user" className="w-10 h-10 rounded-full" />
-                         <div className="flex-1 min-w-0">
-                           <p className="font-bold text-sm truncate">{user.displayName || t('profile.user_placeholder')}</p>
-                           <p className="text-xs text-white/40 truncate">{user.email}</p>
-                         </div>
+                      {/* User info header */}
+                      <div className="flex items-center gap-3 px-3 py-3 mb-1 rounded-xl bg-white/5">
+                        <img
+                          src={user.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
+                          alt="user"
+                          className="w-10 h-10 rounded-full border-2 border-[#ff4d00]/40"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-sm truncate">{user.displayName || t('profile.user_placeholder')}</p>
+                          <p className="text-xs text-white/40 truncate">{user.email}</p>
+                        </div>
                       </div>
 
-                      <button 
-                        onClick={() => { setShowMenu(false); navigate('/profile?tab=history'); }}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm font-medium"
-                      >
-                        <User size={18} /> {t('profile.profile')}
-                      </button>
+                      {[
+                        { icon: User, label: t('profile.profile'), tab: 'history' },
+                        { icon: Clock, label: t('profile.watch_later'), tab: 'watchLater' },
+                        { icon: Heart, label: t('profile.favorites'), tab: 'favorites' },
+                      ].map(({ icon: Icon, label, tab }) => (
+                        <button
+                          key={tab}
+                          onClick={() => { setShowMenu(false); navigate(`/profile?tab=${tab}`); }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-white/5 transition-colors text-sm font-medium text-white/80 hover:text-white"
+                        >
+                          <Icon size={16} className="text-white/40" /> {label}
+                        </button>
+                      ))}
 
-                      <button 
-                        onClick={() => { setShowMenu(false); navigate('/profile?tab=watchLater'); }}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm font-medium"
-                      >
-                        <Clock size={18} /> {t('profile.watch_later')}
-                      </button>
-                      
-                      <button 
-                        onClick={() => { setShowMenu(false); navigate('/profile?tab=favorites'); }}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm font-medium"
-                      >
-                        <Heart size={18} /> {t('profile.favorites')}
-                      </button>
+                      <div className="h-px bg-white/5 my-1 mx-2" />
 
-                      <div className="h-px bg-white/5 my-1" />
-
-                      <button 
+                      <button
                         onClick={() => { logout(); setShowMenu(false); }}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 text-red-500 transition-colors text-sm font-bold"
+                        className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-red-500/10 text-red-400 transition-colors text-sm font-bold"
                       >
-                        <LogOut size={18} /> {t('navbar.logout')}
+                        <LogOut size={16} /> {t('navbar.logout')}
                       </button>
                     </>
                   ) : (
                     <>
-                      <button 
-                        onClick={() => { loginGoogle(); setShowMenu(false); }} 
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm font-medium"
+                      <div className="px-3 py-3 mb-1">
+                        <p className="text-xs text-white/40 font-medium uppercase tracking-wider">{t('navbar.login_email')}</p>
+                      </div>
+                      <button
+                        onClick={() => { loginGoogle(); setShowMenu(false); }}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-sm font-semibold"
                       >
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="G" />
                         {t('navbar.login_google')}
                       </button>
-                      <div className="h-px bg-white/5 my-1" />
-                      <Link 
-                        to="/login" 
-                        onClick={() => setShowMenu(false)} 
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-[#ff4d00]/10 text-[#ff4d00] hover:bg-[#ff4d00] hover:text-white transition-all text-sm font-bold"
+                      <div className="h-px bg-white/5 my-1 mx-2" />
+                      <Link
+                        to="/login"
+                        onClick={() => setShowMenu(false)}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[#ff4d00] hover:bg-[#ff4d00] hover:text-white"
                       >
-                        <Mail size={18} />
+                        <Mail size={16} />
                         {t('navbar.login_email')}
                       </Link>
                     </>
